@@ -55,6 +55,7 @@
 ### 관리자 게시판
 <img width="1566" height="818" alt="image" src="https://github.com/user-attachments/assets/7d24fc9d-f566-4549-9f88-352f7c7e9461" />
 
+### ERD
 <img width="4520" height="2611" alt="Copy of finalProject" src="https://github.com/user-attachments/assets/911caaa6-0c01-411b-9315-2f90906c4e69" />
 
 ---
