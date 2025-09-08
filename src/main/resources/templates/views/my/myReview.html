@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>리뷰 쓰기</title>
+   <!-- 공통 레이아웃 CSS -->
+  <link rel="stylesheet" th:href="@{/css/user/userCommon.css}" />
+
+  <!-- 페이지 전용 CSS -->
+  <link rel="stylesheet" th:href="@{/css/user/myReview.css}" />
+  
+  <!-- 아이콘 CDN (v6) -->
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
+</head>
+<body>
+
+  <!-- 전역 헤더 (공통) -->
+  <div th:replace="~{common/myHeader}"></div>
+
+  <!-- 전역 사이드바 (공통) -->
+  <div th:replace="~{common/mySidebar}"></div>
+
+  <main class="page">
+    <!-- 상단 타이틀바 -->
+    <div class="page-topbar">
+      <button class="icon-btn back" type="button" onclick="history.back()" aria-label="뒤로">←</button>
+      <h1 class="page-title">리뷰 쓰기</h1>
+      <button class="icon-btn help" aria-label="도움말">?</button>
+    </div>
+
+    <!-- 안내 배너 -->
+    <section class="card tip-banner">
+      <div class="tip-text">
+        도움이 되는 리뷰를 많이 쓸수록<br/>
+        체험단 선정 확률이 올라가요
+      </div>
+   
+    </section>
+
+    <!-- 제품 검색 -->
+    <section class="block">
+      <h2 class="block-title req">리뷰를 쓰고 싶은 제품을 검색해 보세요</h2>
+      <div class="search-box">
+        <span class="search-ic">🔍</span>
+        <input class="search-input" type="text" placeholder="제품명이나 성분명으로 찾아보세요"/>
+      </div>
+    </section>
+
+    <!-- 검색 결과 리스트 -->
+    <section class="block" style="margin-top:16px">
+      <div id="searchResults" class="card" style="display:none;padding:12px"></div>
+    </section>
+
+    <hr class="divider"/>
+
+    <!-- 리뷰 작성 폼 -->
+    <form th:action="@{/my/review}" method="post" id="reviewForm">
+      <input type="hidden" name="productNo" id="productNo">
+
+      <!-- 별점 -->
+      <section class="block">
+        <h2 class="block-title center req">이 제품 어떠셨나요?</h2>
+        <div class="stars">
+          <input type="radio" id="star5" name="reviewRate" value="5"/><label for="star5"></label>
+          <input type="radio" id="star4" name="reviewRate" value="4"/><label for="star4"></label>
+          <input type="radio" id="star3" name="reviewRate" value="3"/><label for="star3"></label>
+          <input type="radio" id="star2" name="reviewRate" value="2"/><label for="star2"></label>
+          <input type="radio" id="star1" name="reviewRate" value="1"/><label for="star1"></label>
+        </div>
+      </section>
+
+      <!-- 리뷰 내용 -->
+      <section class="block">
+        <h3 class="q-title pos">좋았던 점 혹은 나만의 팁 <span class="req-dot">*</span></h3>
+        <textarea class="ta" name="reviewContent" rows="5"
+          placeholder="제품을 사용한 날짜와 기간, 좋았던 점을 자세히 남겨주세요" required></textarea>
+        <div class="count">0/5,000 (최소 20자)</div>
+      </section>
+
+      <!-- 안내사항 -->
+      <section class="notice card">
+        <ul>
+          <li>제품과 무관한 사진을 첨부하거나 사이트 기준에 맞지 않는 내용 작성 시 리뷰 수정 요청을 드리며, 다음 영업일 내에 검수하여 포인트가 지급됩니다. (주말/공휴일 제외)</li>
+        </ul>
+      </section>
+
+      <!-- 하단 CTA -->
+      <div class="submit-wrap">
+        <button type="submit" class="primary big">리뷰 등록하기</button>
+      </div>
+    </form>
+  </main>
+
+  <!-- JS -->
+  <script>
+  (function(){
+    const $input = document.querySelector('.search-input');
+    const $list  = document.getElementById('searchResults');
+    const $productNo = document.getElementById('productNo');
+
+    function render(list){
+      if(!list || list.length === 0){
+        $list.style.display = 'none';
+        $list.innerHTML = '';
+        return;
+      }
+      $list.style.display = 'block';
+      $list.innerHTML = list.map(p => `
+        <div class="row" data-no="${p.productNo}" 
+             style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:1px solid #eee">
+          <div>
+            <div style="font-weight:700">${p.productName}</div>
+            <div style="font-size:12px;color:#666">${p.productDetail ?? ''}</div>
+          </div>
+          <button type="button" class="mini-btn">선택</button>
+        </div>
+      `).join('');
+      // 선택 버튼 핸들러
+      $list.querySelectorAll('.row .mini-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const row = e.target.closest('.row');
+          const no  = row.getAttribute('data-no');
+          $productNo.value = no;
+          // 시각 피드백
+          $list.querySelectorAll('.row').forEach(r=>r.style.background='transparent');
+          row.style.background = '#f0f9ff';
+        });
+      });
+    }
+
+    let timer;
+    $input.addEventListener('input', function(){
+      const q = this.value.trim();
+      clearTimeout(timer);
+      if(q.length < 1){ render([]); return; }
+      timer = setTimeout(()=>{
+        fetch(`/my/searchProduct?keyword=` + encodeURIComponent(q))
+          .then(r=>r.json())
+          .then(render)
+          .catch(()=>render([]));
+      }, 250);
+    });
+
+    // 폼 제출 전, productNo 선택 확인
+    document.getElementById('reviewForm').addEventListener('submit', function(e){
+      if(!$productNo.value){
+        e.preventDefault();
+        alert('리뷰를 작성할 제품을 먼저 검색해서 선택해주세요.');
+      }
+    });
+  })();
+  </script>
+</body>
+</html>

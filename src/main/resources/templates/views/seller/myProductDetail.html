@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>상품 상세페이지</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<style>
+body {
+	font-family: 'Apple SD Gothic Neo', sans-serif;
+	background-color: #fff;
+	color: #333;
+}
+
+.product-container {
+	margin-top: 60px;
+}
+
+.product-image {
+	max-width: 100%;
+	border-radius: 10px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.brand-name {
+	color: #777;
+	font-size: 14px;
+}
+
+.product-title {
+	font-size: 24px;
+	font-weight: bold;
+}
+
+.product-price {
+	font-size: 26px;
+	color: #8ad8f0;
+	font-weight: bold;
+	margin-bottom: 10px;
+}
+
+.delivery-info, .payment-info {
+	font-size: 14px;
+	color: #555;
+}
+
+.quantity-box {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.total-price {
+	font-size: 20px;
+	color: #8ad8f0;
+	font-weight: bold;
+	border-top: 1px solid #ccc;
+	padding-top: 15px;
+}
+
+.btn-cart, .btn-buy {
+	font-size: 16px;
+	padding: 12px;
+}
+
+.btn-cart {
+	background-color: #fff;
+	border: 2px solid #8ad8f0;
+	color: #8ad8f0;
+}
+
+.btn-buy {
+	background-color: #eefbfb;
+	color: black;
+}
+
+.thumbnail-list img {
+	width: 60px;
+	height: 60px;
+	object-fit: cover;
+	border: 1px solid #ddd;
+	border-radius: 6px;
+	cursor: pointer;
+}
+
+.rating {
+	color: #f93;
+}
+
+.tabs-section {
+	margin-top: 50px;
+}
+
+/* 기본 배경 색상 설정 */
+#review {
+    background-color: rgba(138, 216, 240, 0.4);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+/* 각 리뷰 카드 스타일 */
+.review-card {
+    background-color: #fff;
+    margin-bottom: 15px;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 리뷰 헤더 (사용자 이름과 평점) */
+.review-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.user-name {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #333;
+    margin-right: 10px;
+}
+
+.ratingStar {
+    font-size: 1.5em;
+    color: #ff9800;
+}
+
+/* 리뷰 본문 스타일 */
+.review-content {
+    font-size: 1em;
+    color: #555;
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+/* 답변 영역 스타일 */
+.response {
+    background-color: #f1f1f1;
+    padding: 10px;
+    margin-top: 15px;
+    border-radius: 5px;
+}
+
+.response-header {
+    font-weight: bold;
+    color: black;
+    margin-bottom: 5px;
+    text-align: left;
+}
+
+.response-content {
+    font-size: 1em;
+    color: #333;
+    margin-top: 5px;
+    text-align: left;
+}
+</style>
+</head>
+<body>
+
+	<div class="container product-container">
+		<input type="hidden" id="productNo" th:value="${p.productNo}"/>
+		<div class="row">
+			<!-- 좌측: 이미지 및 썸네일 -->
+			<div class="col-md-6">
+				<img th:src="@{/} + ${attm.attmRename}" class="product-image mb-3" alt="상품 이미지">
+			</div>
+			<!-- 우측: 상품 정보 -->
+			<div class="col-md-6">
+				<p class="brand-name">[[${p.brandName}]]</p>
+				<h1 class="product-title">[[${p.productName}]]</h1>
+				<p class="product-price" th:text="${#numbers.formatInteger(p.productPrice, 3, 'COMMA') + '원'}"/>
+				<p>[[${p.ingredient}]]</p>
+				<p>[[${p.ecoFriendly}]]</p>
+				<p class="text-danger">
+					<select>
+						<option th:each="c : ${cList}">[[${c.couponName}]]</option>
+					</select>
+				</p>
+
+				<hr>
+
+				<div class="payment-info mb-3">
+					<strong>결제혜택</strong><br> CJ카드 추가 10% 할인<br> 포인트 최대 1% 적립
+				</div>
+
+				<div class="mb-3 quantity-box">
+					<label>수량</label> 
+					<input type="number" class="form-control w-25" value="1" min="1" th:max="${p.productStock}">
+				</div>
+
+				<div class="total-price mb-3" th:text="'총 상품 금액 : ' + ${#numbers.formatInteger(p.productPrice, 3, 'COMMA') + ' 원'}"></div>
+
+			</div>
+		</div>
+
+		<!-- 탭 -->
+		<div class="tabs-section">
+			<ul class="nav nav-tabs mt-5" id="productTab" role="tablist">
+				<li class="nav-item" role="presentation">
+					<button class="nav-link active" id="detail-tab" data-bs-toggle="tab" data-bs-target="#detail" type="button" role="tab">상세정보</button>
+				</li>
+				<li class="nav-item" role="presentation">
+					<button class="nav-link" id="review-tab" data-bs-toggle="tab" data-bs-target="#review" type="button" role="tab">후기</button>
+				</li>
+				<li class="nav-item" role="presentation">
+					<button class="nav-link" id="QnA-tab" data-bs-toggle="tab" data-bs-target="#QnA" type="button" role="tab">상품 Q&A</button>
+				</li>
+			</ul>
+			<div class="tab-content" id="productTabContent" style="text-align: center;">
+				<div class="tab-pane fade show active p-3" id="detail" role="tabpanel" th:utext="${p.productDetail}">
+				</div>
+				<div class="tab-pane fade p-3" id="review" role="tabpanel">
+				    <div th:each="r : ${rList}">
+				        <div class="review-card">
+				            <!-- 리뷰 내용 -->
+				            <div class="review-header">
+				                <span class="user-name">[[${r.userName}]]</span>
+				                <div class="ratingStar" th:text="${r.reviewRate}"></div>
+				            </div>
+				            <div class="review-content">[[${r.reviewContent}]]</div>
+				            
+				            <!-- 리뷰에 대한 답변 영역 -->
+				            <div class="response">
+				                <div class="response-header">[[${p.brandName}]]</div>
+				                <div class="response-content">
+				                    <p>여기에 답변 내용이 들어갑니다.</p>
+				                </div>
+				            </div>
+				        </div>
+				    </div>
+				</div>
+				<div class="tab-pane fade p-3" id="QnA" role="tabpanel">
+					<h5 class="rating">배송이 안와요</h5>
+					<p>주문한지 2주가 지났는데 배송이 안와요...</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	
+	<script>
+		window.onload = () => {
+// 			document.querySelector('#review-tab').addEventListener('click', () => {
+// 				const rating = 4;
+// 				const filledStar = '\u2605';
+// 				const starString = filledStar.repeat(rating);
+				
+// 				document.querySelector('#review').textContent = starString;
+// 			});
+
+// 			document.querySelector('#review-tab').addEventListener('click', () => {
+// 				const productNo = document.querySelector('#productNo').value;
+// 				//console.log(productNo)
+// 				fetch('/product/productReview/' + productNo)
+// 				.then(res => res.json())
+// 				.then(data => {
+// 					//console.log(data[0].reviewContent)
+					
+// 					const filledStar = '\u2605';
+// 				})
+// 				.catch(err => console.log(err))
+// 			});
+
+
+			const ratingStars = document.querySelectorAll('.ratingStar');
+			//console.log(ratingStar)
+			for(ratingStar of ratingStars){
+				const rating = ratingStar.innerText;
+				//console.log(rating)
+				const filledStar = '\u2605';
+				const starString = filledStar.repeat(rating);
+				//console.log(starString)
+				ratingStar.innerText = starString;
+				
+			}
+ 		}
+	</script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>공지사항 수정</title>
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css"/>
+    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+</head>
+<body>
+
+<div th:replace="~{common/header :: header}"></div>
+
+<h2>공지사항 수정</h2>
+
+<form th:action="@{/notice/update}" method="post" id="noticeForm">
+    <input type="hidden" name="boardId" th:value="${notice.boardId}">
+
+    <div>
+        <label>제목</label>
+        <input type="text" name="boardTitle" th:value="${notice.boardTitle}" required style="width: 80%;">
+    </div>
+
+    <br>
+
+    <div>
+        <label>게시판 종류</label>
+        <select name="boardType" required>
+            <option value="1" th:selected="${notice.boardType == 1}">공지사항</option>
+            <option value="2" th:selected="${notice.boardType == 2}">이벤트</option>
+            <option value="3" th:selected="${notice.boardType == 3}">문의사항</option>
+            <option value="4" th:selected="${notice.boardType == 4}">쿠폰</option>
+            <option value="5" th:selected="${notice.boardType == 5}">커뮤니티</option>
+        </select>
+    </div>
+
+    <div>
+        <label>내용</label>
+        <div id="editor"></div>
+        <textarea id="boardContent" name="boardContent" style="display:none;"
+                  th:text="${notice.boardContent}"></textarea>
+    </div>
+
+    <input type="hidden" name="uploadedFiles" id="uploadedFiles">
+
+    <button type="submit">수정 완료</button>
+    <button type="button" id="cancelBtn">취소</button>
+</form>
+
+<div th:replace="~{common/footer :: footer}"></div>
+
+<script>
+    const uploadedFilesArr = [];
+    const initialContent = document.getElementById("boardContent").value;
+
+    const editor = new toastui.Editor({
+        el: document.querySelector('#editor'),
+        height: '500px',
+        width: '90%',
+        initialEditType: 'wysiwyg',
+        hideModeSwitch: true,
+        initialValue: initialContent,
+        toolbarItems: [
+            ['heading', 'bold', 'italic', 'strike'],
+            ['hr', 'quote'],
+            ['ul', 'ol'],
+            ['table', 'link'],
+            ['image']
+        ],
+        hooks: {
+            addImageBlobHook: async (blob, callback) => {
+                const formData = new FormData();
+                formData.append('image', blob);
+
+                const response = await fetch('/notice/uploadImage', {method: 'POST', body: formData});
+                const url = await response.text();
+                callback(url, 'image');
+
+                uploadedFilesArr.push(url.split('/').pop());
+                document.getElementById('uploadedFiles').value = uploadedFilesArr.join(',');
+            }
+        }
+    });
+
+    const form = document.getElementById("noticeForm");
+    form.addEventListener("submit", function (e) {
+        document.getElementById("boardContent").value = editor.getHTML();
+    });
+
+    // 취소 버튼 클릭 시 이전 페이지로 이동
+    document.getElementById("cancelBtn").addEventListener("click", function () {
+        history.back();
+    });
+</script>
+
+</body>
+</html>

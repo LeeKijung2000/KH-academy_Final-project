@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>쇼핑몰 예제</title>
+  <style>
+    .board-title {
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: #333;
+      border-left: 6px solid #6ec1e4;
+      padding-left: 10px;
+      margin-bottom: 20px;
+    }
+
+    .notice-table {
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .notice-table thead {
+      background-color: #6ec1e4;
+      color: #fff;
+    }
+
+    .notice-table th,
+    .notice-table td {
+      text-align: center;
+      vertical-align: middle;
+      padding: 15px;
+    }
+
+    .notice-table tbody tr:hover {
+      background-color: #f2faff;
+      cursor: pointer;
+    }
+
+    /* 검색창 & 버튼 */
+    .search-form input.form-control {
+        height: 36px;          /* 높이 조정 */
+        font-size: 0.9rem;     /* 폰트 크기 작게 */
+        padding: 0 10px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+    }
+
+    .search-form select.form-select {
+        height: 36px;
+        font-size: 0.9rem;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+    }
+
+    .search-form .btn-search {
+        height: 36px;
+        padding: 0 15px;
+        font-size: 0.7rem;
+        background-color: #6ec1e4;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        transition: background-color 0.3s;
+    }
+
+    .search-form .btn-search:hover {
+        background-color: #5ab0d8;
+    }
+
+  </style>
+</head>
+<body>
+
+<div th:replace="~{common/header :: header}"></div>
+
+<main class="container my-5">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="board-title">커뮤니티</h2>
+    <form th:action="@{/community/list}" method="get" class="d-flex align-items-center search-form">
+      <input type="text" name="keyword" class="form-control me-2" placeholder="검색어를 입력하세요" th:value="${keyword}">
+      <select name="type" class="form-select me-2">
+        <option value="title" th:selected="${type=='title'}">제목</option>
+        <option value="content" th:selected="${type=='content'}">내용</option>
+        <option value="all" th:selected="${type=='all'}">제목+내용</option>
+      </select>
+      <button type="submit" class="btn btn-search">검색</button>
+    </form>
+  </div>
+
+
+
+    <!-- 커뮤니티 게시글 리스트 (썸네일 포함 카드 형식) -->
+    <div class="row row-cols-1 row-cols-md-4 g-4">
+        <div class="col" th:each="community : ${communitys}">
+            <div class="card h-100"
+                 th:onclick="|location.href='/community/detail?boardId=${community.boardId}&page=${pi.currentPage}'|"
+                 style="cursor:pointer;">
+
+                <!-- 썸네일 이미지 -->
+                <img th:src="${community.thumbnailPath != null} ? @{${community.thumbnailPath}} : @{/images/no-image.png}"
+                     class="card-img-top" style="height: 180px; object-fit: cover;" alt="썸네일 이미지"/>
+
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${community.boardTitle}">제목</h5>
+<!--                    <p class="card-text text-truncate" style="max-height: 60px;" th:text="${community.boardContent}">내용</p>-->
+                </div>
+                <div class="card-footer text-muted small">
+                    작성자: [[${community.userName}]] | 날짜: <span th:text="${community.boardDate}"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <br/>
+
+  <!-- 페이지네이션 -->
+  <nav aria-label="Standard pagination example" class="d-flex justify-content-end">
+    <ul class="pagination">
+
+      <!-- 이전 버튼 -->
+      <li class="page-item" th:classappend="${pi.currentPage == 1} ? 'disabled'">
+        <a class="page-link"
+           th:if="${pi.currentPage > 1}"
+           th:href="@{${loc}(page=${pi.currentPage-1})}"
+           aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+        <span class="page-link" th:unless="${pi.currentPage > 1}">&laquo;</span>
+      </li>
+
+      <!-- 페이지 번호 -->
+      <li class="page-item" th:each="p : ${#numbers.sequence(pi.startPage, pi.endPage)}"
+          th:classappend="${p == pi.currentPage} ? 'active'">
+        <a class="page-link" th:href="@{${loc}(page=${p})}">[[${p}]]</a>
+      </li>
+
+      <!-- 다음 버튼 -->
+      <li class="page-item" th:classappend="${pi.currentPage == pi.maxPage} ? 'disabled'">
+        <a class="page-link"
+           th:if="${pi.currentPage < pi.maxPage}"
+           th:href="@{${loc}(page=${pi.currentPage+1})}"
+           aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+        <span class="page-link" th:unless="${pi.currentPage < pi.maxPage}">&raquo;</span>
+      </li>
+
+    </ul>
+  </nav>
+
+  <!-- 등록 버튼 (페이지네이션 아래쪽에 위치) -->
+  <div th:if="${session.loginUser != null}"
+       class="d-flex justify-content-end mt-3"
+       style="clear: both;">
+    <a href="/community/write" class="btn btn-primary px-4">
+      등록
+    </a>
+  </div>
+</main>
+
+<div th:replace="~{common/footer :: footer}"></div>
+
+</body>
+</html>

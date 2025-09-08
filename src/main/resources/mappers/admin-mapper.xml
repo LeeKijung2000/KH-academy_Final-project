@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="itView.springboot.mapper.AdminMapper">
+<!-- 회원 전체 조회-->
+<select id="getUserListCount" resultType="int">
+select count(*) 
+    from (
+        select u.user_no, u.user_id, u.email, u.user_type, u.brand_name, u.user_status,
+               count(r.report_no) as reportCount
+        from "USER" u
+        left join REPORT r on u.user_no = r.reporter_user_id
+        group by u.user_no, u.user_id, u.email, u.user_type, u.brand_name, u.user_status)t
+	<if test="value != null and value != ''">
+		<choose>
+			<when test="condition == 'userId'">
+				where user_id like '%' || #{value} || '%'
+			</when>
+			<when test="condition == 'userType'">
+				where user_type like '%'|| #{value} ||'%'
+			</when>
+			<when test="condition == 'userStatus'">
+				where user_status like '%' || #{value} || '%'
+			</when>
+			<when test="condition == 'reportCount'">
+				where reportCount = #{value}
+			</when>
+			<otherwise>
+            	where (user_id like '%' || #{value} || '%')
+            </otherwise>
+		</choose>
+	</if>
+</select>
+
+<select id="selectUserList" resultType="itView.springboot.dto.UserReport">
+	select * 
+    from (
+        select u.user_no, u.user_id, u.email, u.user_type, u.brand_name, u.user_status,
+               count(r.report_no) as reportCount
+        from "USER" u
+        left join REPORT r on u.user_no = r.reporter_user_id
+        group by u.user_no, u.user_id, u.email, u.user_type, u.brand_name, u.user_status)t
+	<if test="value != null and value != ''">
+		<choose>
+			<when test="condition == 'userId'">
+				where upper(user_id) like '%' || upper(#{value}) || '%'
+			</when>
+			<when test="condition == 'userType'">
+				where upper(user_type) like '%'|| upper(#{value})||'%'
+			</when>
+			<when test="condition == 'userStatus'">
+				where upper(user_status) like '%' || upper(#{value}) || '%'
+			</when>
+			<when test="condition == 'reportCount'">
+				where reportCount = #{value}
+			</when>
+			<otherwise>
+            	where (upper(user_id) like '%' || upper(#{value}) || '%')
+            </otherwise>
+		</choose>
+	</if>
+</select>
+
+<select id="selectUser" parameterType="int" resultType="itView.springboot.dto.UserReport">
+	select * from "USER" where user_no = #{userNo}
+</select>
+
+
+<!-- 신고부분
+	(1)신고회원리스트 조회 -->
+<select id="getReportListCount" resultType="int">
+select count(*) 
+    from report r
+    	join "USER" u on r.reporter_user_id = u.user_no
+	 <if test="value != null and value != ''">
+		<choose>
+			<when test="condition == 'reportTitle'">
+				where upper(report_title) like '%' || upper(#{value}) || '%'
+			</when>
+			<when test="condition == 'writer'">
+				where upper(user_id) like '%'|| upper(#{value}) ||'%'
+			</when>
+			<when test="condition == 'reportType'">
+				where upper(report_type) = upper(#{value}) 
+			</when>
+			<when test="condition == 'reportStatus'">
+				where upper(report_status) = #{value}
+			</when>
+			<otherwise>
+            	where (upper(r.report_title) like '%' || upper(#{value}) || '%')
+            </otherwise>
+	  </choose>
+	</if>
+</select>
+
+<select id="selectReportList" resultType="itView.springboot.dto.ReportDetail">
+    SELECT r.report_no,
+           r.report_title,
+           r.report_date,
+           r.report_modify_date,
+           r.report_status,
+           r.report_type,
+           r.reporter_user_id,
+           r.report_target_no,
+           u.user_id AS writer
+    FROM report r
+    LEFT JOIN "USER" u 
+    	 ON  r.reporter_user_id = u.user_no
+        <if test="value != null and value != ''">
+            <choose>
+                <when test="condition == 'reportTitle'">
+                    where UPPER(r.report_title) LIKE '%' || UPPER(#{value}) || '%'
+                </when>
+                <when test="condition == 'writer'">
+                    where UPPER(u.user_id) LIKE '%' || UPPER(#{value}) || '%'
+                </when>
+                <when test="condition == 'reportType'">
+                    where UPPER(r.report_type) = UPPER(#{value})
+                </when>
+                <when test="condition == 'reportStatus'">
+                    where UPPER(r.report_status) = UPPER(#{value})
+                </when>
+                <otherwise>
+            		where upper(r.report_title like '%' || #{value} || '%')
+            	</otherwise>
+            </choose>
+        </if>
+    ORDER BY r.report_date DESC
+</select>
+
+
+<select id="selectReportDetail" parameterType="int" resultType="itView.springboot.dto.ReportDetail">
+	select * from report where report_no = #{reportNo}
+</select>
+
+
+<!-- 일반 문의 게시판 조회 -->
+<select id="gBoardListCount" parameterType="int" resultType="java.lang.Integer">
+	select count(*) from board where board_type = '3' and board_status = 'Y'
+</select>
+<select id="selectBoardList" resultType="Board">
+	select 
+		b.board_id,
+		b.board_title,
+		b.board_content,
+		b.board_date,
+		b.board_modified_date,
+		b.board_type,
+		b.board_status,
+		b.user_no,
+		b.board_reply_status,
+		u.user_id
+	from board b
+	join
+		"USER" u 
+		 on b.user_no = u.user_no
+	where board_type='3' and board_status ='Y'
+</select>
+
+
+
+
+<!-- 판매자 문의게시판 조회하기 -->
+<select id="pBoardListCount" parameterType="int" resultType="java.lang.Integer">
+	select count(*) from board where board_type = '3' and board_status = 'Y'
+</select>
+<select id="selectpBoardList" resultType="Board">
+	select 
+		b.board_id,
+		b.board_title,
+		b.board_content,
+		b.board_date,
+		b.board_modified_date,
+		b.board_type,
+		b.board_status,
+		b.user_no,
+		b.board_reply_status,
+		u.brand_name
+	from board b
+	join
+		"USER" u 
+		 on b.user_no = u.user_no
+	where board_type='7' and board_status ='Y'
+</select>
+
+<!-- 판매금지 제품 조회 -->
+<select id="getproListCount" parameterType="int" resultType="java.lang.Integer">
+SELECT COUNT(*)
+    FROM BOARD b
+    JOIN PRODUCT p ON b.USER_NO = p.USER_NO
+    <where>
+    	b.BOARD_STATUS = 'Y' AND BOARD_TYPE='8'
+        <if test="value != null and value != ''">
+            <choose>
+                <when test="condition == 'productName'">
+                    AND UPPER(p.PRODUCT_NAME) LIKE '%' || UPPER(#{value}) || '%'
+                </when>
+                <when test="condition == 'productCompany'">
+                    AND UPPER(p.PRODUCT_COMPANY) LIKE '%' || UPPER(#{value}) || '%'
+                </when>
+                <when test="condition == 'boardDate'">
+                    AND TO_CHAR(b.BOARD_DATE, 'YYYY-MM-DD') = #{value}
+                </when>
+                <otherwise>
+                    AND (UPPER(p.PRODUCT_NAME) LIKE '%' || UPPER(#{value}) || '%')
+                </otherwise>
+            </choose>
+        </if>
+    </where>
+</select>
+
+<select id="selecProhibitList" resultType="itView.springboot.dto.prohibitProduct">
+SELECT p.product_no,
+	   p.product_name,
+	   p.PRODUCT_CATEGORY,
+       p.PRODUCT_COMPANY,
+       p.PRODUCT_STATE,
+       b.BOARD_ID,
+       b.BOARD_TITLE,
+       b.BOARD_CONTENT,
+       b.BOARD_DATE,
+       b.BOARD_MODIFIED_DATE,
+       b.BOARD_TYPE,
+       b.BOARD_STATUS
+    FROM BOARD b
+    JOIN PRODUCT p ON b.USER_NO = p.USER_NO
+    <where>
+    	b.BOARD_STATUS = 'Y'AND BOARD_TYPE='8'
+        <if test="value != null and value != ''">
+            <choose>
+                <when test="condition == 'productName'">
+                    AND UPPER(p.PRODUCT_NAME) LIKE '%' || UPPER(#{value}) || '%'
+                </when>
+                <when test="condition == 'productCompany'">
+                    AND UPPER(p.PRODUCT_COMPANY) LIKE '%' || UPPER(#{value}) || '%'
+                </when>
+                <when test="condition == 'boardDate'">
+                    AND TO_CHAR(b.BOARD_DATE, 'YYYY-MM-DD') = #{value}
+                </when>
+                <otherwise>
+                    AND (UPPER(p.PRODUCT_NAME) LIKE '%' || UPPER(#{value}) || '%')
+                </otherwise>
+            </choose>
+        </if>
+    </where>
+</select>
+
+<!-- 판매금지 제품 공지사항 등록 -->
+<insert id="proBoardEnroll" parameterType="Board">
+	<selectKey  keyProperty="boardId" resultType="int" order="BEFORE">
+		select seq_board.nextval from dual
+	</selectKey>
+	INSERT INTO board (
+	    board_id,
+	    board_title,
+	    board_date,
+	    board_modified_date,
+	    board_type,
+	    board_status,
+	    user_no,
+	    board_content
+	) VALUES (
+	    #{boardId},
+	    #{boardTitle},
+	    SYSDATE,
+	    SYSDATE,
+	    '8',
+	    'Y',
+	    #{userNo},
+	    #{boardContent}
+	)
+
+</insert>
+
+
+
+
+
+
+</mapper>

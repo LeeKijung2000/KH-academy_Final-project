@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>체험단 당첨내역</title>
+
+  <!-- 공통 레이아웃 CSS -->
+  <link rel="stylesheet" th:href="@{/css/user/userCommon.css}"/>
+
+  <!-- 페이지 전용 CSS -->
+  <link rel="stylesheet" th:href="@{/css/user/ExperienceWins.css}"/>
+
+  <!-- 아이콘 -->
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
+</head>
+<body>
+
+  <!-- 공통 헤더/사이드바 -->
+  <div th:replace="~{common/myHeader}"></div>
+  <div th:replace="~{common/mySidebar}"></div>
+
+  <main class="page">
+    <!-- 상단 타이틀바 -->
+    <div class="page-topbar">
+      <h1 class="page-title">체험단 당첨내역</h1>
+    </div>
+
+    <!-- 비어있을 때 -->
+    <section class="card" th:if="${#lists.isEmpty(winList)}">
+      <p class="muted" style="margin:0">당첨 내역이 없습니다.</p>
+    </section>
+
+    <!-- 당첨 리스트 (사진 / 상품명 / 당첨여부) -->
+    <section class="card win-list" th:if="${!#lists.isEmpty(winList)}">
+      <article class="win-item" th:each="w : ${winList}">
+        <!-- 상품 이미지 -->
+        <img class="thumb"
+             th:src="${w['productImageUrl']}"
+             alt="상품 이미지"
+             onerror="this.onerror=null; this.src='/uploadFilesFinal/default-product.png';"/>
+
+        <!-- 상품명 -->
+        <div class="meta">
+          <div class="pname" th:text="${w['productName']}">상품명</div>
+        </div>
+
+        <!-- 당첨 여부(상태) -->
+        <div class="status">
+          <span class="badge"
+                th:text="${w['winStatusName'] ?: '당첨'}">당첨</span>
+        </div>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

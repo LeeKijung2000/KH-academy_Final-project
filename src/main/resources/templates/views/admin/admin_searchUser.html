@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자용 회원조회</title>
+    <link rel="stylesheet" href="/css/adminCss/admin_searchUser.css">
+    <link href="/css/inhoCss/sidebar.css" rel="stylesheet" type="text/css" />
+    <link href="/css/inhoCss/header.css" rel="stylesheet" type="text/css"/>
+    <script src="/js/admin/admin_searchUser.js" defer></script>
+     <script src="/js/inhoAdmin/sidebar.js" defer></script>
+     <!-- 아이콘 & 폰트 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Poppins:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+</head>
+<body>
+	<div class="container">
+		<!-- 사이드바 -->
+		<div th:replace="~{common/sidebar :: sidebar}"></div>
+		<!-- 컨텐츠 영역 -->
+	    <div class="content-area">
+			<!-- 헤더 -->
+			<div th:replace="~{common/header2 :: header2}"></div>
+	
+		   <div class="admin-searchUser-wrapper">
+		       <div class="admin-searchUser-header">
+		           <div class="admin-searchUser-title">회원 조회</div>
+		           <div class="admin-searchUser-searchBox">
+		               <form th:action="@{/admin/searchUser}" method="get">
+		                   <select name="condition" class="form-select">
+		                       <option value="userId" th:selected="${condition == 'userId'}">회원 아이디</option>
+		                       <option value="userType" th:selected="${condition == 'userType'}">가입 유형</option>
+		                       <option value="userStatus"th:selected="${condition == 'userStatus'}">활동 상태</option>
+		                       <option value="reportCount" th:selected="${condition == 'reportCount'}">누적 신고횟수</option>
+		                   </select>
+		                   <input type="search" name="value" class="form-control"
+		                   		  placeholder="검색어 입력"
+		                   		  style="width:250px; display:inline;">
+		                   <button class="searchUser-btn" type="submit">
+		                       <i class="ti ti-search"></i>
+		                   </button>
+		               </form>
+		           </div>
+		       </div>
+		       <hr class="admin-searchUser-divider"/>
+		
+		       <div class="admin-searchUser-table">
+		           <table id="admin-searchUser-table-header" class="admin-genBoard-table-header">
+		               <thead>
+		                   <tr>
+		                       <th>가입유형</th>
+		                       <th>회원 아이디</th>
+		                       <th>이메일</th> 
+		                       <th>활동 상태</th>
+		                       <th>누적 신고횟수</th>
+		                   </tr>
+		               </thead>
+		               <tbody id="admin-searchUser-table-body" 
+			               	  th:each="user : ${userList}"
+			               	  class="admin-genBoard-table-body">
+		                   <tr>
+		                       <td th:text="${user.userType =='P' ? '판매자' : '일반'}"></td>
+		                       <td>
+		                       	<a
+		                       	  th:text="${user.userType == 'P' ? user.brandName : user.userId}"
+		                       	  th:href="@{/admin/userDetail(userNo=${user.userNo})}">
+		                       	</a> 
+		                       	   </td>
+		                       <td th:text="${user.email}"></td>
+		                       <td th:text="${user.userStatus}"></td>
+		                       <td th:text="${user.reportCount}"></td>
+		                   </tr>
+		               </tbody>
+		           </table>
+		           <ul class="admin-searchUser-pagination">
+		               <li class="admin-searchUser-page-item" th:classappend="${pi.currentPage == 1} ? 'disabled'">
+				           <a class="page-link"
+			                   th:if="${pi.currentPage > 1}"
+			                   th:href="@{${loc}(page=${pi.currentPage-1})}"
+			                   aria-label="Previous">
+	                       <span aria-hidden="true">&laquo;</span>
+	                	   </a>
+	                	   <span class="page-link" th:unless="${pi.currentPage > 1}">&laquo;</span>    
+			           </li>
+		              
+		              
+		               <li class="admin-searchUser-page-item" th:each="p : ${#numbers.sequence(pi.startPage, pi.endPage)}"
+		               	   th:classappend="${p == pi.currentPage} ? 'active'">
+			               <a class="page-link" th:href="@{${loc}(page=${p})}">[[${p}]]</a>
+            		   </li>
+		               
+		               <li class="admin-searchUser-page-item" th:classappend="${pi.currentPage == pi.maxPage} ? 'disabled'">
+				           	<a class="page-link"
+			                   th:if="${pi.currentPage < pi.maxPage}"
+			                   th:href="@{${loc}(page=${pi.currentPage+1})}"
+			                   aria-label="Next">
+			                   <span aria-hidden="true">&raquo;</span>
+	                		</a> 
+                			<span class="page-link" th:unless="${pi.currentPage < pi.maxPage}">&raquo;</span>
+            			</li>
+		           </ul>
+		
+		
+		
+		
+		       </div>
+
+
+
+			</div>
+       </div>
+   </div>
+
+
+
+</body>
+</html>

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>상품 등록 페이지</title>
+<link href="/css/seller/productInsertPage.css" rel="stylesheet"
+	type="text/css" />
+<link href="/summernote/summernote-lite.css" rel="stylesheet" />
+<!-- 	<link href="../../../static/css/seller/sidebar.css" rel="stylesheet"/> -->
+<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+<script src="/summernote/summernote-lite.js"></script>
+<script src="/summernote/summernote-ko-KR.js"></script>
+</head>
+<body>
+
+	<div th:replace="~{common/sellerHeader :: sellerHeader}"></div>
+
+	<div class="layout">
+		<div th:replace="~{common/sellerSidebar :: sellerSidebar}"></div>
+
+		<div class="content">
+			<h2>상품 등록 페이지</h2>
+			<form action="/product/insertProduct" method="POST" encType="multipart/form-data">
+				<input type="hidden" name="categoryParent" id="categoryParent"/>
+				<input type="hidden" name="categoryName" id="categoryName"/>
+				<div class="form-group">
+					<label>상품명</label> <input type="text" name="productName" placeholder="상품명을 입력하세요" />
+				</div>
+
+				<div class="form-group">
+					<label>상품 설명</label>
+					<textarea id="summernote" name="editordata"></textarea>
+				</div>
+
+				<div class="form-group">
+					<label>제조 회사</label> 
+					<input type=text name="productCompany" th:value="${session.loginUser.brandName}" readonly/>
+				</div>
+
+				<div class="form-group">
+					<label>상품 대표 이미지</label> 
+					<input type="file" name="productImage" />
+				</div>
+
+				<div class="form-group">
+					<label>재고 수량</label> 
+					<input type="number" name="productStock" min="0" />
+				</div>
+
+				<div class="form-group">
+					<label>상품 가격</label> 
+					<input type="number" name="productPrice" min="0" />
+				</div>
+
+				<!-- 카테고리 선택 -->
+				<div class="form-group">
+					<label>카테고리</label>
+
+					<!-- 대분류 버튼 그룹 -->
+					<div class="option-group">
+						<div class="option-row" id="main-category"></div>
+					</div>
+
+					<!-- 소분류 버튼 그룹 -->
+					<div class="option-group">
+						<div class="option-row" id="sub-category"></div>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label>상품 정보</label>
+
+					<div class="option-group">
+						<p class="option-title">추천 피부 타입</p>
+						<div class="option-row">
+							<input type="radio" id="skinType1" name="skinType" value="건성">
+							<label for="skinType1">건성</label> 
+							<input type="radio" id="skinType2" name="skinType" value="지성"> 
+							<label for="skinType2">지성</label> 
+							<input type="radio" id="skinType3" name="skinType" value="민감성"> 
+							<label for="skinType3">민감성</label>
+							<input type="radio" id="skinType4" name="skinType" value="복합성">
+							<label for="skinType4">복합성</label> 
+							<input type="radio" id="skinType5" name="skinType" value="수부지"> 
+							<label for="skinType5">수부지</label>
+							<input type="radio" id="skinType6" name="skinType" value="공용"> 
+							<label for="skinType6">공용</label>
+						</div>
+					</div>
+
+					<div class="option-group">
+						<p class="option-title">추천 연령</p>
+						<div class="option-row">
+							<input type="radio" id="ageGroup0" name="userAge" value="모든 연령">
+							<label for="ageGroup0">모든 연령</label> 
+							<input type="radio" id="ageGroup1" name="userAge" value="10대"> 
+							<label for="ageGroup1">10대</label> 
+							<input type="radio" id="ageGroup2" name="userAge" value="20대"> 
+							<label for="ageGroup2">20대</label>
+							<input type="radio" id="ageGroup3" name="userAge" value="30대">
+							<label for="ageGroup3">30대</label> 
+							<input type="radio" id="ageGroup4" name="userAge" value="40대"> 
+							<label for="ageGroup4">40대</label> 
+							<input type="radio" id="ageGroup5" name="userAge" value="50대"> 
+							<label for="ageGroup5">50대</label>
+							<input type="radio" id="ageGroup6" name="userAge" value="60대">
+							<label for="ageGroup6">60대 이상</label>
+						</div>
+					</div>
+
+					<div class="option-group">
+						<p class="option-title">추천 성별</p>
+						<div class="option-row">
+							<input type="radio" id="gender1" name="gender" value="M">
+							<label for="gender1">남자</label> 
+							<input type="radio" id="gender2" name="gender" value="F"> 
+							<label for="gender2">여자</label>
+							<input type="radio" id="gender3" name="gender" value="A">
+							<label for="gender3">모든 성별</label>
+						</div>
+					</div>
+
+					<div class="option-group">
+						<p class="option-title">퍼스널컬러</p>
+						<div class="option-row">
+							<input type="radio" id="personalColor1" name="personalColor" value="봄 웜톤"> 
+							<label for="personalColor1">봄 웜톤</label> 
+							<input type="radio" id="personalColor2" name="personalColor" value="여름 쿨톤"> 
+							<label for="personalColor2">여름 쿨톤</label>
+							<input type="radio" id="personalColor3" name="personalColor" value="가을 웜톤"> 
+							<label for="personalColor3">가을 웜톤</label>
+							<input type="radio" id="personalColor4" name="personalColor" value="겨울 쿨톤"> 
+							<label for="personalColor4">겨울 쿨톤</label>
+							<input type="radio" id="personalColor5" name="personalColor" value="해당 없음"> 
+							<label for="personalColor5">해당 없음</label>
+						</div>
+					</div>
+
+					<div class="option-group">
+						<p class="option-title">피부 태그</p>
+						<div class="option-row">
+							<input type="radio" id="skinTag1" name="skinTrouble" value="미백/잡티">
+							<label for="skinTag1">미백/잡티</label> 
+							<input type="radio" id="skinTag2" name="skinTrouble" value="피지/블랙헤드"> 
+							<label for="skinTag2">피지/블랙헤드</label> 
+							<input type="radio" id="skinTag3" name="skinTrouble" value="속건조"> 
+							<label for="skinTag3">속건조</label>
+							<input type="radio" id="skinTag4" name="skinTrouble" value="주름/탄력">
+							<label for="skinTag4">주름/탄력</label> 
+							<input type="radio" id="skinTag5" name="skinTrouble" value="각질">
+							<label for="skinTag5">각질</label>
+							<input type="radio" id="skinTag6" name="skinTrouble" value="해당 없음">
+							<label for="skinTag6">해당 없음</label>
+						</div>
+					</div>
+
+					<div class="option-group">
+						<p class="option-title">두피/모발</p>
+						<div class="option-row">
+							<input type="radio" id="scalpHair1" name="headSkin" value="탈모">
+							<label for="scalpHair1">탈모</label> 
+							<input type="radio" id="scalpHair2" name="headSkin" value="손상모"> 
+							<label for="scalpHair2">손상모</label> 
+							<input type="radio" id="scalpHair3" name="headSkin" value="열감두피"> 
+							<label for="scalpHair3">열감두피</label>
+							<input type="radio" id="scalpHair4" name="headSkin" value="지성두피">
+							<label for="scalpHair4">지성두피</label> 
+							<input type="radio" id="scalpHair5" name="headSkin" value="비듬/각질"> 
+							<label for="scalpHair5">비듬/각질</label> 
+							<input type="radio" id="scalpHair6" name="headSkin" value="해당 없음"> 
+							<label for="scalpHair6">해당 없음</label>
+						</div>
+					</div>
+					
+					<div class="option-group">
+						<p class="option-title">성분</p>
+						<div class="option-row">
+							<input type="radio" id="natural" name="ingredient" value="natural"/>
+							<label for="natural">천연 & 식물 유래 성분</label>
+							
+							<input type="radio" id="vitamin" name="ingredient" value="vitamin"/>
+							<label for="vitamin">비타민 & 항산화 성분</label>
+							
+							<input type="radio" id="peptide" name="ingredient" value="peptide"/>
+							<label for="peptide">기능성 펩타이드 & 단백질 성분</label>
+							
+							<input type="radio" id="moisture" name="ingredient" value="moisture"/>
+							<label for="moisture">보습 & 피부장벽 특화 성분</label>
+							
+							<input type="radio" id="cleansing" name="ingredient" value="cleansing"/>
+							<label for="cleansing">피부 정화 & 각질 케어 성분</label>
+						</div>
+					</div>
+					
+					<div class="option-grop">
+						<p class="option-title">친환경 유/무</p>
+						<div class="option-row">
+							<input type="radio" id="eco" name="ecoFriendly" value="Y"/>
+							<label for="eco">친환경 제품</label>
+							
+							<input type="radio" id="noEco" name="ecoFriendly" value="N"/>
+							<label for="noEco">일반 제품</label>
+						</div>
+					</div>
+				</div>
+
+				<div class="form-buttons">
+					<button type="submit">완료</button>
+					<button type="button">취소</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<script>
+	// 상품 설명 작성
+	$('#summernote').summernote({
+		toolbar : [
+			['fontname', ['fontname']],
+			['fontsize', ['fontsize']],
+			['style', ['bold', 'italic', 'underline', 'strikethrough', 'clear']],
+			['color', ['forecolor', 'color']],
+			['table', ['table']],
+			['para', ['ul', 'ol', 'paragraph']],
+			['height', ['height']],
+			['insert', ['picture', 'link', 'video']]
+		],
+		fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', '맑은 고딕', '궁서', '굴림체', '굴림', '돋움체', '바탕체'],
+		fontSizes: ['8', '9', '10', '11', '12', '14', '16', '18', '20', '22', '24', '28', '30', '36', '50', '72'],
+		height: 450,
+		lang: "ko-KR",
+		
+		
+		// 이미지 업로드 처리
+		callbacks : {                                                    
+			onImageUpload : function(files) {   
+                // 다중 이미지 처리를 위해 for문을 사용했습니다.
+				for (var i = 0; i < files.length; i++) {
+					imageUploader(files[i], this);
+				}
+			},
+			// 이미지 삭제
+			onMediaDelete: function(target){
+				//console.log('onMediaDelete 호출')
+				//console.log(target)
+				
+				let src = target[0].src;
+				
+				$.ajax({
+					url: '/seller/imageDelete',
+					type: 'POST',
+					data: { imageUrl: src},
+					success: data => {
+						console.log(data);
+					},
+					error: data => {
+						console.log(data)
+					}
+				});
+			}
+		}
+		
+		
+	});
+	
+	function imageUploader(file, el){
+		let formData = new FormData();
+		formData.append('file', file);
+		
+		$.ajax({
+			url : '/seller/imageUpload',
+			type : 'post',
+			data : formData,
+			enctype : 'multipart/form-data',
+			processData : false,
+			contentType : false,
+			success : function(data){
+				
+				const parsedData = typeof data === 'string' ? JSON.parse(data) : data;
+				
+				console.log(parsedData)
+				
+				const imageUrl = '/' + parsedData.url;
+// 				console.log(imageUrl)
+// 				console.log(parsedData.url)
+				$(el).summernote('insertImage', imageUrl)
+					
+			},
+			error : data => console.log(data)
+		});
+	}
+  // 대분류 및 소분류 데이터
+  const categories = {
+    "스킨케어": ["스킨/토너", "에센스/세럼/앰플", "크림", "로션", "미스트/오일"],
+    "클렌징": ["클렌징폼/젤", "오일/밤", "워터/밀크", "필링/스크럽", "티슈/패드", "립&아이리무버"],
+    "메이크업": ["립메이크업", "베이스메이크업", "아이메이크업"],
+    "헤어케어": ["샴푸/린스", "트리트먼트/팩", "헤어에센스", "염색약/펌"],
+    "바디케어": ["샤워/입욕", "핸드케어", "풋케어", "제모/왁싱", "데오드란트"],
+    "선케어": ["선크림", "선스틱", "선쿠션", "선스프레이/선패치", "태닝"],
+    "맨즈케어": ["스킨케어", "메이크업", "쉐이빙/왁싱", "바디케어", "헤어케어"],
+    "마스크팩": ["시트팩", "패드", "페이셜팩", "코팩", "패치"]
+  };
+
+  const mainCategoryEl = document.getElementById("main-category");
+  const subCategoryEl = document.getElementById("sub-category");
+
+  let selectedMain = null;
+  let selectedSub = null;
+
+  // 대분류 버튼 생성
+  Object.keys(categories).forEach(main => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = main;
+    btn.className = "option-button";
+    btn.addEventListener("click", () => {
+      selectedMain = main;
+      selectedSub = null;
+
+      // 버튼 UI 갱신
+      document.querySelectorAll("#main-category .option-button").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      // 소분류 버튼 생성
+      subCategoryEl.innerHTML = "";
+      categories[main].forEach(sub => {
+        const subBtn = document.createElement("button");
+        subBtn.type = "button";
+        subBtn.textContent = sub;
+        subBtn.className = "option-button";
+        subBtn.addEventListener("click", () => {
+          selectedSub = sub;
+
+          // 소분류 버튼 UI 갱신
+          document.querySelectorAll("#sub-category .option-button").forEach(b => b.classList.remove("active"));
+          subBtn.classList.add("active");
+
+          // 👉 여기에 선택된 카테고리 처리 코드 넣으면 됨 (예: 숨겨진 input에 저장)
+          console.log("선택됨:", selectedMain, selectedSub);
+          document.querySelector('#categoryParent').value = selectedMain
+          document.querySelector('#categoryName').value = selectedSub
+        });
+        subCategoryEl.appendChild(subBtn);
+      });
+    });
+    mainCategoryEl.appendChild(btn);
+  });
+  
+	window.onload = () => {
+		
+	}
+</script>
+</body>
+</html>

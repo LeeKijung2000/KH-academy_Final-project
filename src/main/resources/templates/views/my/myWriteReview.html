@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>내 리뷰</title>
+<!-- 공통 레이아웃 CSS -->
+<link rel="stylesheet" th:href="@{/css/user/userCommon.css}" />
+
+<!-- 페이지 전용 CSS -->
+<link rel="stylesheet" th:href="@{/css/user/myWriteReview.css}" />
+<!-- 아이콘 CDN (v6) -->
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
+</head>
+<body>
+
+  <!-- 전역 헤더 (공통) -->
+  <div th:replace="~{common/myHeader}"></div>
+
+  <!-- 전역 사이드바 (공통) -->
+  <div th:replace="~{common/mySidebar}"></div>
+
+  
+
+  <main class="page">
+    <!-- 상단 타이틀바 -->
+    <div class="page-topbar">
+      <a class="back-btn" href="javascript:history.back()" aria-label="뒤로가기">
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+      </a>
+      
+    
+    </div>
+
+	<section class="empty-state" th:if="${#lists.isEmpty(myReviews)}">
+  <h2 class="empty-title">내가 쓴 리뷰가 없어요</h2>
+  <p class="empty-sub">리뷰를 작성하면 이곳에 목록이 나타납니다.</p>
+</section>
+
+<section class="card" th:if="${!#lists.isEmpty(myReviews)}">
+  <h2 class="section-bar">내 리뷰</h2>
+  <ul class="review-list">
+    <li class="review-item" th:each="r : ${myReviews}">
+      <div class="ri-top">
+       <img class="ri-thumb"
+     th:src="${r['productImageUrl']}"
+     alt="상품 이미지"
+     onerror="this.onerror=null; this.src='/uploadFilesFinal/default-product.png';"/>
+
+        <div class="ri-head">
+          <span class="ri-product" th:text="${r['productName']}">상품명</span>
+          <span class="ri-date"
+                th:text="${#dates.format(r['reviewDate'], 'yyyy.MM.dd')}">2025.09.05</span>
+        </div>
+      </div>
+      <div class="ri-rate">
+        <span th:each="i : ${#numbers.sequence(1,5)}">
+          <i th:class="${i <= (r['reviewRate']?:0)} ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
+        </span>
+        <b th:text="${r['reviewRate']}">0</b>/5
+      </div>
+      <div class="ri-content" th:text="${r['reviewContent']}">내용</div>
+    </li>
+  </ul>
+</section>
+
+  
+
+    <!-- 전체 조회수 카드 -->
+    <section class="stat-card">
+      <div class="stat-left">
+        <span class="stat-icon" aria-hidden="true">📈</span>
+        <span class="stat-label">전체 조회수</span>
+      </div>
+      <div class="stat-value">??회</div>
+    </section>
+
+    <!-- 차트 카드 (더미) -->
+    <section class="chart-card card">
+      <div class="chart-head">
+        <div class="dot"></div>
+        <h3 class="chart-title">나는 상위 몇%일까?</h3>
+      </div>
+      <div class="chart-area">
+        <div class="chart-fake">
+          <p>리뷰를 쓰고 데이터가 쌓이면<br/>내가 상위 몇%인지 알 수 있어요</p>
+        </div>
+        <div class="chart-axis">
+          <span>80%</span><span>60%</span><span>50%</span><span>40%</span>
+          <span>30%</span><span>20%</span><span>10%</span><span>5%</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 하단 안내 -->
+    <p class="note">
+      It:View 쇼핑 구매와 상관없이 모든 제품의 리뷰를 쓸 수 있어요
+    </p>
+   
+  </main>  
+</body>
+
+
+
+
+</html>

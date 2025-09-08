@@ -1,0 +1,70 @@
+/* ===== 공통 레이아웃(이 페이지에서 쓰는 최소치) ===== */
+.page-topbar{display:flex;align-items:center;gap:12px;margin:10px 4px 18px}
+.page-title{font-size:22px;font-weight:700;margin:0}
+
+/* 카드 공통 */
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  box-shadow:0 1px 3px rgba(0,0,0,.04);
+  padding:var(--space);
+  margin:10px 4px;
+}
+
+/* 빈 상태 */
+.muted{color:var(--muted)}
+
+/* ===== 당첨 리스트 ===== */
+.win-list{padding:8px 0}
+
+/* 단일 아이템: [썸네일] [상품명] [상태뱃지] */
+.win-item{
+  display:grid;
+  grid-template-columns:64px 1fr auto;
+  gap:12px;
+  align-items:center;
+  padding:12px 0;
+  border-top:1px solid var(--line);
+}
+.win-item:first-child{border-top:none}
+
+/* 썸네일 */
+.thumb{
+  width:64px;height:64px;
+  border-radius:12px;
+  object-fit:cover;
+  background:#f3f4f6;
+  border:1px solid var(--line);
+}
+
+/* 상품명 */
+.meta{min-width:0}
+.pname{
+  font-weight:700;
+  font-size:15px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+
+/* 상태 뱃지(기본) */
+.status{display:flex;align-items:center;justify-content:flex-end}
+.badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  height:28px;padding:0 10px;border-radius:999px;
+  border:1px solid var(--line);
+  background:#f3f4f6;color:#111;font-size:12px;white-space:nowrap;
+}
+
+/* (선택) 상태별 색상 – 사용하려면 서버에서 클래스 추가해 주세요
+   예: th:classappend="'badge--win'"
+*/
+.badge--win{background:#ecfdf5;border-color:#10b98133;color:#047857}     /* 당첨 */
+.badge--done{background:#eef2ff;border-color:#6366f133;color:#4338ca}    /* 지급완료 등 */
+.badge--cancel{background:#fef2f2;border-color:#ef444433;color:#b91c1c}  /* 취소 */
+
+/* 데스크톱 살짝 키우기 */
+@media (min-width:1024px){
+  .page-title{font-size:24px}
+  .thumb{width:72px;height:72px}
+  .pname{font-size:16px}
+}

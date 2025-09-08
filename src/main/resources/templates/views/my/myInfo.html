@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>내 정보 수정</title>
+
+  <link rel="stylesheet" th:href="@{/css/user/userCommon.css}" />
+  <link rel="stylesheet" th:href="@{/css/user/myInfo.css}" />
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
+
+  <meta name="_csrf" th:content="${_csrf?.token}">
+  <meta name="_csrf_header" th:content="${_csrf?.headerName}">
+</head>
+<body>
+
+  <div th:replace="~{common/myHeader}"></div>
+  <div th:replace="~{common/mySidebar}"></div>
+
+  <main class="page">
+    <div class="page-topbar">
+      <button class="icon-btn back" type="button" onclick="history.back()" aria-label="뒤로">←</button>
+      <h1 class="page-title">내 정보 수정</h1>
+      <button class="text-btn save" type="submit" form="infoForm">저장</button>
+    </div>
+
+    <div class="card" th:if="${msg}" style="margin:6px 0">
+      <span th:text="${msg}">메시지</span>
+    </div>
+
+    <!-- 프로필 사진 -->
+    <section class="card">
+      <h2 class="section-bar">프로필 사진</h2>
+      <div class="form-row">
+        <label class="form-label">현재 사진</label>
+        <div class="form-field" style="display:flex;align-items:center;gap:12px">
+          <img id="profilePreview"
+               th:src="${profileImageUrl}"
+               src="/uploadFilesFinal/default-avatar.png"
+               onerror="this.src='/uploadFilesFinal/default-avatar.png'"
+               alt="프로필"
+               style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:1px solid #e5e7eb" />
+          <form th:action="@{/my/profile-image}" method="post" enctype="multipart/form-data">
+            <input type="hidden" th:name="${_csrf?.parameterName}" th:value="${_csrf?.token}" />
+            <input id="profileFile" type="file" name="file" accept="image/*" required />
+            <button type="submit" class="ghost-btn">프로필 변경</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- 기본/피부 정보 입력 -->
+    <form id="infoForm" class="form" th:action="@{/my/info}" method="post">
+      <input type="hidden" th:name="${_csrf?.parameterName}" th:value="${_csrf?.token}" />
+
+      <h2 class="section-bar">기본 정보</h2>
+
+      <div class="form-row">
+        <label class="form-label">이메일</label>
+        <div class="form-field">
+          <input type="email" class="input" name="email"
+                 th:value="${user?.email}"
+                 placeholder="email@example.com" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">닉네임</label>
+        <div class="form-field nickname-wrap">
+          <input id="nicknameInput" type="text" class="input" name="nickname"
+                 maxlength="12" th:value="${user?.userName}" />
+          <button id="nicknameCheckBtn" class="ghost-btn" type="button">중복확인</button>
+          <p id="nicknameHelp" class="helper">2~12글자까지 입력할 수 있어요</p>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label required">성별</label>
+        <div class="form-field">
+          <div class="chip-group single">
+            <input id="g-f" name="gender" type="radio" value="F"
+                   th:checked="${user?.userGender == 'F'}"/><label for="g-f" class="chip">여성</label>
+            <input id="g-m" name="gender" type="radio" value="M"
+                   th:checked="${user?.userGender == 'M'}"/><label for="g-m" class="chip">남성</label>
+            <input id="g-n" name="gender" type="radio" value="N"
+                   th:checked="${user?.userGender == 'N'}"/><label for="g-n" class="chip">선택안함</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- 연령대(표시용) -->
+      <div class="form-row">
+        <label class="form-label required">연령</label>
+        <div class="form-field">
+          <div class="chip-group single">
+            <input id="age-10" name="ageRange" type="radio" value="10"
+                   th:checked="${ageBand != null and ageBand == 10}"/><label for="age-10" class="chip">10대</label>
+            <input id="age-20" name="ageRange" type="radio" value="20"
+                   th:checked="${ageBand != null and ageBand == 20}"/><label for="age-20" class="chip">20대</label>
+            <input id="age-30" name="ageRange" type="radio" value="30"
+                   th:checked="${ageBand != null and ageBand == 30}"/><label for="age-30" class="chip">30대</label>
+            <input id="age-40" name="ageRange" type="radio" value="40"
+                   th:checked="${ageBand != null and ageBand == 40}"/><label for="age-40" class="chip">40대</label>
+            <input id="age-50" name="ageRange" type="radio" value="50"
+                   th:checked="${ageBand != null and ageBand == 50}"/><label for="age-50" class="chip">50대</label>
+            <input id="age-60" name="ageRange" type="radio" value="60"
+                   th:checked="${ageBand != null and ageBand >= 60}"/><label for="age-60" class="chip">60대 이상</label>
+          </div>
+          <p class="helper">아래 ‘생년’을 저장하면 연령대가 자동 반영돼요.</p>
+        </div>
+      </div>
+
+      <!-- ✅ 생년 DATE(실제 저장 필드) -->
+      <div class="form-row">
+        <label class="form-label required">생년</label>
+        <div class="form-field">
+          <input type="date" name="birthDate"
+                 th:value="${user?.userAge != null ? #dates.format(user.userAge,'yyyy-MM-dd') : ''}"
+                 class="input"/>
+          <p class="helper">생년을 설정해야 마이페이지에 연령대가 정확히 표시됩니다.</p>
+        </div>
+      </div>
+
+      <h2 class="section-bar">
+        피부 정보 <span class="muted">맞춤 서비스를 이용하려면 반드시 선택해 주세요</span>
+      </h2>
+
+      <div class="form-row top">
+        <label class="form-label">피부 타입<br><small>(1개)</small></label>
+        <div class="form-field">
+          <div class="chip-group single">
+            <input id="sk-oily" name="skinType" type="radio" value="OILY"
+                   th:checked="${user?.skinType == 'OILY'}"/><label for="sk-oily" class="chip">지성</label>
+            <input id="sk-dry"  name="skinType" type="radio" value="DRY"
+                   th:checked="${user?.skinType == 'DRY'}"/><label for="sk-dry"  class="chip">건성</label>
+            <input id="sk-combi" name="skinType" type="radio" value="COMBI"
+                   th:checked="${user?.skinType == 'COMBI'}"/><label for="sk-combi" class="chip">복합성</label>
+            <input id="sk-sens" name="skinType" type="radio" value="SENSITIVE"
+                   th:checked="${user?.skinType == 'SENSITIVE'}"/><label for="sk-sens" class="chip">민감성</label>
+            <input id="sk-dehy" name="skinType" type="radio" value="DEHYDRATED"
+                   th:checked="${user?.skinType == 'DEHYDRATED'}"/><label for="sk-dehy" class="chip">수부지</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">퍼스널컬러<br><small>(1개)</small></label>
+        <div class="form-field">
+          <div class="chip-group single">
+            <input id="pc-spr"  name="personalColor" type="radio" value="SPRING"
+                   th:checked="${user?.personalColor == 'SPRING'}"/><label for="pc-spr"  class="chip">봄웜톤</label>
+            <input id="pc-sum"  name="personalColor" type="radio" value="SUMMER"
+                   th:checked="${user?.personalColor == 'SUMMER'}"/><label for="pc-sum"  class="chip">여름쿨톤</label>
+            <input id="pc-fall" name="personalColor" type="radio" value="FALL"
+                   th:checked="${user?.personalColor == 'FALL'}"/><label for="pc-fall" class="chip">가을웜톤</label>
+            <input id="pc-win"  name="personalColor" type="radio" value="WINTER"
+                   th:checked="${user?.personalColor == 'WINTER'}"/><label for="pc-win"  class="chip">겨울쿨톤</label>
+            <input id="pc-unk"  name="personalColor" type="radio" value="UNKNOWN"
+                   th:checked="${user?.personalColor == 'UNKNOWN'}"/><label for="pc-unk"  class="chip">잘 모르겠어요</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">피부 고민</label>
+        <div class="form-field">
+          <div class="chip-group multi">
+            <input id="c1" name="concerns" value="BRIGHTENING" type="checkbox"
+                   th:checked="${#lists.contains(concernList, 'BRIGHTENING')}"/><label for="c1" class="chip">미백/잡티</label>
+            <input id="c2" name="concerns" value="SEBUM" type="checkbox"
+                   th:checked="${#lists.contains(concernList, 'SEBUM')}"/><label for="c2" class="chip">피지/블랙헤드</label>
+            <input id="c3" name="concerns" value="DRYNESS" type="checkbox"
+                   th:checked="${#lists.contains(concernList, 'DRYNESS')}"/><label for="c3" class="chip">속건조</label>
+            <input id="c4" name="concerns" value="WRINKLE" type="checkbox"
+                   th:checked="${#lists.contains(concernList, 'WRINKLE')}"/><label for="c4" class="chip">주름/탄력</label>
+            <input id="c5" name="concerns" value="KERATIN" type="checkbox"
+                   th:checked="${#lists.contains(concernList, 'KERATIN')}"/><label for="c5" class="chip">각질</label>
+            <input id="c9" name="concerns" value="NONE" type="checkbox"
+                   th:checked="${#lists.contains(concernList, 'NONE')}"/><label for="c9" class="chip">해당없음</label>
+          </div>
+        </div>
+      </div>
+
+      <section class="notice card">
+        <ul>
+          <li>입력한 정보를 저장하면 맞춤 추천 등 서비스 제공을 위한 정보 이용에 동의하게 됩니다.</li>
+          <li>자세한 내용은 개인정보 처리방침에서 확인할 수 있습니다.</li>
+        </ul>
+      </section>
+    </form>
+  </main>
+
+  <script>
+    (function(){
+      const fileInput = document.getElementById('profileFile');
+      const preview   = document.getElementById('profilePreview');
+      if (!fileInput || !preview) return;
+      fileInput.addEventListener('change', function(e){
+        const f = e.target.files && e.target.files[0];
+        if (f) { preview.src = URL.createObjectURL(f); }
+      });
+    })();
+  </script>
+
+  <script>
+    (function(){
+      const $btn  = document.getElementById('nicknameCheckBtn');
+      const $inp  = document.getElementById('nicknameInput');
+      const $help = document.getElementById('nicknameHelp');
+      if (!$btn || !$inp || !$help) return;
+
+      const csrfToken  = document.querySelector('meta[name="_csrf"]')?.content;
+      const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content || 'X-CSRF-TOKEN';
+
+      $btn.addEventListener('click', async function(){
+        const nickname = ($inp.value || '').trim();
+        if (nickname.length < 2 || nickname.length > 12) {
+          $help.textContent = '닉네임은 2~12자여야 합니다.';
+          $help.style.color = '#ef4444';
+          return;
+        }
+        try {
+          const resp = await fetch(`/my/check-nickname?nickname=${encodeURIComponent(nickname)}`, {
+            method: 'GET',
+            headers: csrfToken ? { [csrfHeader]: csrfToken } : {}
+          });
+          if (!resp.ok) throw new Error('네트워크 오류');
+          const data = await resp.json();
+          if (data.sameAsMine) {
+            $help.textContent = '현재 사용 중인 닉네임입니다.';
+            $help.style.color = '#10b981';
+          } else if (data.available) {
+            $help.textContent = '사용 가능한 닉네임입니다.';
+            $help.style.color = '#10b981';
+          } else {
+            $help.textContent = '이미 사용 중인 닉네임입니다.';
+            $help.style.color = '#ef4444';
+          }
+        } catch (e) {
+          $help.textContent = '중복 확인 중 오류가 발생했습니다.';
+          $help.style.color = '#ef4444';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

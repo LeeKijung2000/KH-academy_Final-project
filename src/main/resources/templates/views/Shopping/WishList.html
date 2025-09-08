@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>찜&gt;&lt;</title>
+<link rel="stylesheet" href="../../../css/user/userCommon.css"/>
+
+ <!-- 아이콘(CDN) -->
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer" />
+<style>
+body {
+	background: #f7f8f9;
+}
+
+.all{
+margin-right: 5%;
+	margin-left: 7%;
+	margin-bottom:3%;
+	margin-top:2%;
+}
+.wish-Top {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+#checkdelete {
+	float: right;
+	font-size: 16px;
+	background: none;
+	border: none;
+	color: gray;
+}
+
+#checkdelete:hover {
+	font-weight: bold;
+	color: black;
+}
+#sort {
+	border: 1px solid #ccc;
+	border-radius: 8px;
+	padding: 8px 8px;
+	font-size: 16px;
+	outline: none;
+	cursor: pointer;
+}
+
+.quantity {
+	color: gray;
+	margin-left: 2%;
+	margin-right: 2%;
+	font-size: 18px;
+}
+
+hr {
+	margin-bottom: 1.5%;
+}
+
+.product-list {
+	display: flex;
+	gap: 5%;
+	margin-left: 2%;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+.product-item {
+	display: flex;
+	align-items: flex-start;
+	width: 20%;
+	margin-top: 1.5%;
+	flex-direction: column;
+}
+
+.check {
+	margin-bottom: 6%;
+	transform: scale(1.5);
+	cursor: pointer;
+}
+
+.product-image {
+	position: relative;
+	background-color: #aaa;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-bottom: 8px;
+	width: 240px; /* 고정 크기 */
+	height: 230px;
+	border-radius: 6px;
+}
+
+.delete-btn {
+	position: absolute;
+	background: none;
+	border: none;
+	color: gray;
+	font-size: 18px;
+	top: 2.5%;
+	right: 2%;
+}
+.delete-btn:hover {
+	color: black;
+	font-weight: bold;
+}
+.product-info p {
+	margin: 2px 0;
+	text-align: left;
+}
+
+.price {
+	color: #8ad8f0;
+	font-size: 20px;
+	font-weight: bold;
+}
+
+.brand {
+	font-size: 18px;
+}
+
+.name {
+	color: gray;
+	font-size: 18px;
+}
+
+#cart-insert {
+	margin-top: 2%;
+	margin-left: 2%;
+	margin-right: 2%;
+	display: block;
+	width: calc(100% - 4%);
+	padding: 13px 0;
+	background-color: #eefbfb;
+	color: black;
+	font-size: 18px;
+	font-weight: bold;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	border: 1px solid #c2e4e4;
+}
+
+#cart-insert:hover {
+	background: #8ad8f0;
+	color: white;
+}
+</style>
+</head>
+<body>
+<!-- 전역 헤더 (공통) -->
+  <header class="site-header"><a href="index">It:View</a></header>
+
+  <!-- 전역 사이드바 (공통) : 아이콘 구조로 교체 -->
+  <nav class="sidenav" aria-label="Primary">
+    <div class="sidenav-top">
+      <a class="nav-item active" href="/my/myInfo"><i class="fa-solid fa-user"></i><span>마이페이지</span></a>
+      <a class="nav-item" href="/experience/experienceApplication"><i class="fa-solid fa-gift"></i><span>체험단 신청</span></a>
+      <a class="nav-item" href="/my/myReview"><i class="fa-solid fa-star"></i><span>리뷰</span></a>
+      <a class="nav-item" href="/Shopping/cart"><i class="fa-solid fa-cart-shopping"></i><span>장바구니</span></a>
+      <a class="nav-item" href="/Shopping/WishList"><i class="fa-solid fa-heart"></i><span>찜</span></a>
+      <a class="nav-item"><i class="fa-solid fa-right-from-bracket"></i><span>로그아웃</span></a>
+    </div>
+    </nav>
+    <div class="all">
+	<div class="wish-Top">
+	<form action="wishSort" method="get">
+		<select id="sort" name="wishSortType">
+			<option value="newest" selected>최신순</option>
+			<option value="oldest">담은순</option>
+			<option value="popular">인기순</option>
+			<option value="review">리뷰많은순</option>
+		</select>
+	</form>
+		<button type="button" id="checkdelete">선택삭제</button>
+	</div>
+	
+	<hr>
+
+	<span class="quantity">상품(<span class="total-product">[[${#lists.size(wlist)}]]</span>개)</span>
+	<div class="product-list">
+		<div class="product-item" th:each="w:${wlist}">
+			<input type="checkbox" class="check" th:value="${w.wishlistNo}" th:data-productno="${w.productNo}"/>
+			<div class="product-image">
+				<img th:each="a:${alist}" th:if="${a.positionNo==w.productNo}"
+						th:src="@{/uploadFilesFinal/{file}(file=${a.attmRename})}"
+						width="100%" height="100%" style="border-radius: 8px;" />
+				<button class="delete-btn" type="button" th:data-wishno="${w.wishlistNo}">X</button>
+			</div>
+			<div class="product-info">
+				<p class="price" th:text="${#numbers.formatInteger(w.productPrice,3,'COMMA')}+'원'"></p>
+				<p class="brand">[[${w.productCompany}]]</p>
+				<p class="name">[[${w.productName}]]</p>
+			</div>
+		</div>
+		<div class="product-item">
+			<input type="checkbox" class="check">
+			<div class="product-image">
+				이미지1
+				<button class="delete-btn" type="button">X</button>
+			</div>
+			<div class="product-info">
+				<p class="price">가격</p>
+				<p class="brand">브랜드</p>
+				<p class="name">상품이름</p>
+			</div>
+		</div>
+		<div class="product-item">
+			<input type="checkbox" class="check">
+			<div class="product-image">
+				이미지1
+				<button class="delete-btn" type="button">X</button>
+			</div>
+			<div class="product-info">
+				<p class="price">가격</p>
+				<p class="brand">브랜드</p>
+				<p class="name">상품이름</p>
+			</div>
+		</div>
+		<div class="product-item">
+			<input type="checkbox" class="check">
+			<div class="product-image">
+				이미지1
+				<button class="delete-btn" type="button">X</button>
+			</div>
+			<div class="product-info">
+				<p class="price">가격</p>
+				<p class="brand">브랜드</p>
+				<p class="name">상품이름</p>
+			</div>
+		</div>
+		<div class="product-item">
+			<input type="checkbox" class="check">
+			<div class="product-image">
+				이미지1
+				<button class="delete-btn" type="button">X</button>
+			</div>
+			<div class="product-info">
+				<p class="price">가격</p>
+				<p class="brand">브랜드</p>
+				<p class="name">상품이름</p>
+			</div>
+		</div>
+	</div>
+	<button type="button" id="cart-insert">선택 상품 장바구니 담기</button>
+</div>
+</body>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+	window.onload=()=>{
+		
+		const items = document.querySelectorAll('.check');
+		const checkdelete = document.getElementById('checkdelete');
+		const deleteBtn = document.querySelectorAll('.delete-btn');
+		const cartInsert=document.getElementById('cart-insert');
+		
+		
+		
+		if(checkdelete != null){
+			checkdelete.addEventListener('click',()=>{
+				const checkedItems=[];
+				
+				for(let i =0; i<items.length; i++){
+					if(items[i].checked){
+						checkedItems.push(items[i].value);
+					}
+				}
+				
+				if(checkedItems.length === 0){
+					alert('삭제할 상품을 선택하세요.');
+					return;
+				}
+				$.ajax({
+					url:'/Shopping/wishcheckDeletewish',
+					type:'post',
+					traditional:true,
+					data:{wishlistNo:checkedItems},
+					success: data =>{
+						if(data > 0){
+							alert('선택한 상품이 삭제되었습니다.');
+							location.reload();
+						}else{
+							alert('상품 삭제 중 오류가 발생했습니다.');
+						}
+					},
+					error:data => console.log(data)
+				});
+			});
+			
+		}	
+			
+		
+		deleteBtn.forEach(btn=>{
+			btn.addEventListener('click',()=>{
+				
+				const wishlistNo=btn.dataset.wishno;
+				
+				if(wishlistNo!=null){
+					if(confirm('상품을 삭제하시겠습니까?')){
+						$.ajax({
+							url:'/Shopping/wishproductDelete',
+							type:'post',
+							data:{wishlistNo:wishlistNo},
+							success: data =>{
+								if(data > 0){
+									alert('상품이 삭제되었습니다.');
+									location.reload();
+								}else{
+									alert('상품 삭제 중 오류가 발생했습니다.');
+								}
+							},
+							error:data => console.log(data)
+						});
+					}
+	
+				}
+			});
+		});
+		
+		
+		cartInsert.addEventListener('click',()=>{
+			const checkedItems = [...document.querySelectorAll('.check:checked')].map(el => el.value);
+			
+			if (checkedItems.length === 0) {
+		        alert('장바구니에 담을 상품을 선택해주세요.');
+		        return;
+		      }
+			
+			$.ajax({
+				url:'/Shopping/wishToCart',
+				type:'post',
+				traditional: true,                  
+		        data: { wishlistNo: checkedItems },
+				success: data =>{
+					if(data==-1){
+						alert("로그인을 해주세요.");
+						location.href='/login';
+					}else if(data > 0){
+						if (confirm('선택 상품을 장바구니에 담았습니다. 장바구니로 이동하시겠습니까?')) {
+							location.href='/Shopping/cart';
+							}
+						}else{
+							alert('선택 상품을 장바구니에 담는 도중 오류가 발생하였습니다.');
+						}
+				},
+				error:data => console.log(data)
+			});
+		});
+		
+	}
+		
+</script>
+
+</html>

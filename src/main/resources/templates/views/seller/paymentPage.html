@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>주문/결제 페이지</title>
+<link href="/css/seller/paymentPage.css" rel="stylesheet"
+	type="text/css" />
+</head>
+<body>
+	<div class="container">
+		<h1>주문 결제</h1>
+		<hr />
+
+		<label for="name">이름</label> <input type="text" id="name"
+			placeholder="이름을 입력하세요" /> <label>주소</label>
+		<div class="address">서울특별시 중구 남대문로 120</div>
+
+		<label for="delivery">배송 요청사항</label> <select id="delivery">
+			<option>문 앞</option>
+			<option>직접 받고 부재 시 문 앞</option>
+			<option>경비실</option>
+			<option>택배함</option>
+		</select> <label>결제수단</label>
+		<div class="payment-options">
+			<label><input type="radio" name="paymentOption" /> 카카오페이</label> 
+			<label><input type="radio" name="paymentOption" /> TOSS</label> 
+			<label><input type="radio" name="paymentOption" /> 네이버 Pay</label> 
+			<label><input type="radio" name="paymentOption" /> 카드 결제</label>
+		</div>
+
+		<button class="submit-btn">결제하기</button>
+	</div>
+</body>
+</html>

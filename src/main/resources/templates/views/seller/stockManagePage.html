@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>재고 관리 페이지</title>
+<link href="/css/seller/stockManagePage.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+
+	<div th:replace="~{common/sellerHeader :: sellerHeader}"></div>
+
+	<div class="layout">
+		<div th:replace="~{common/sellerSidebar :: sellerSidebar}"></div>
+
+		<div class="content">
+			<h2>재고 관리 페이지</h2>
+
+			<!-- 재고 목록 -->
+			<form>
+				<div class="stock-item" th:each="p : ${list}">
+					<input type="hidden" name="productNo" th:value="${p.productNo}"/>
+					<input type="hidden" name="userNo" th:value="${p.userNo}"/>
+					<div class="stock-name">상품 번호 [[${p.productNo}]] [[${p.productName}]]</div>
+					<div class="stock-controls">
+						<input type="number" min="0" name="productStock" th:value="${p.productStock}"/>
+						<button type="button" class="editButtons">수정</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+	
+	<script>
+		window.onload = () =>{
+			const buttons = document.querySelectorAll('.editButtons');
+			for(button of buttons){
+				button.addEventListener('click', e => {
+					//const productStock = e.target.previousElementSibling.value;
+					//const productNo = e.target.parentElement.parentElement.children[0].value;
+					//const userNo = e.target.parentElement.parentElement.children[1].value;
+					//console.log(productStock)
+					//console.log(productNo)
+					//console.log(userNo)
+					
+					const product = {
+						'productStock' : e.target.previousElementSibling.value,
+						'productNo' : e.target.parentElement.parentElement.children[0].value,
+						'userNo' : e.target.parentElement.parentElement.children[1].value
+					}
+					
+					fetch('/product/Stock', {
+						method: 'PUT',
+						headers: {
+							'Content-Type' : 'application/json'
+						},
+						body : JSON.stringify(product)
+					})
+					.then(response => response.json())
+					.then(data => {
+						if(data > 0){
+							alert('재고량 수정이 성공하였습니다.')
+						} else {
+							alert('재고량 수정 중 오류가 발생했습니다.')
+							location.reload();
+						}
+					})
+					.catch(err => {
+						console.log(err)
+					})
+				});
+			}
+		}
+	</script>
+
+</body>
+</html>

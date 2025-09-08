@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>내 포인트</title>
+
+  <!-- 공통 레이아웃 CSS -->
+  <link rel="stylesheet" th:href="@{/css/user/userCommon.css}" />
+
+  <!-- 페이지 전용 CSS -->
+  <link rel="stylesheet" th:href="@{/css/user/myPoint.css}" />
+
+  <!-- 아이콘 -->
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" />
+</head>
+<body>
+
+  <!-- ✅ 공통 헤더/사이드바 include -->
+  <div th:replace="~{common/myHeader}"></div>
+  <div th:replace="~{common/mySidebar}"></div>
+
+  <main class="page">
+    <!-- 상단 타이틀바 -->
+    <div class="page-topbar">
+      <h1 class="page-title">포인트</h1>
+    </div>
+
+    <!-- 포인트 카드 -->
+    <section class="point-card card" aria-labelledby="pointHeading">
+      <div class="card-left">
+        <h2 id="pointHeading" class="card-title">내 포인트</h2>
+        <div class="point-big" th:text="${pointBalance} + 'P'">0P</div>
+        <p class="muted" th:text="${expireSoonText}">
+          소멸 예정 포인트는 각 적립건의 만료일을 확인하세요.
+        </p>
+      </div>
+     
+    </section>
+
+    <!-- 필터 탭 -->
+    <nav class="tabs" aria-label="포인트 내역 필터">
+      <button class="tab active" type="button" data-filter="all">전체</button>
+      <button class="tab" type="button" data-filter="save">적립</button>
+      <button class="tab" type="button" data-filter="use">사용</button>
+      <button class="tab" type="button" data-filter="expire">소멸</button>
+    </nav>
+
+    <!-- 포인트 내역 (널/빈 리스트 안전) -->
+    <section class="history" aria-live="polite"
+             th:if="${histories != null and !#lists.isEmpty(histories)}">
+      <div th:each="h, stat : ${histories}"
+           th:with="
+              curr=${#dates.format(h.pointCreatedate,'yyyy년 MM월')},
+              prev=${stat.index > 0 ? #dates.format(histories[stat.index-1].pointCreatedate,'yyyy년 MM월') : ''},
+              type=${h.pointValue > 0} ? 'save' : ((h.pointDescription != null and #strings.contains(h.pointDescription,'소멸')) ? 'expire' : 'use')
+           ">
+
+        <!-- 월 헤더 -->
+        <div class="month" th:if="${stat.index == 0 or curr != prev}"
+             th:text="${curr}">2025년 08월</div>
+
+        <!-- 목록 행 -->
+        <div class="row" th:attr="data-type=${type}">
+          <div>
+            <p class="row-title"
+               th:text="${h.pointName != null ? h.pointName : (h.pointValue > 0 ? '포인트 적립' : '포인트 차감')}">
+              포인트 항목
+            </p>
+            <div class="date"
+                 th:text="${h.pointCreatedate != null ? #dates.format(h.pointCreatedate,'yyyy-MM-dd HH:mm') : ''}">
+              2025-08-20 14:21
+            </div>
+          </div>
+          <div class="right">
+            <div class="amount"
+                 th:classappend="${h.pointValue > 0} ? ' plus' : ''"
+                 th:text="${(h.pointValue > 0 ? '+' : '') + h.pointValue} + 'P'">
+              +0P
+            </div>
+            <div class="expire" th:if="${h.pointEnddate != null}"
+                 th:text="'소멸 예정일: ' + ${#dates.format(h.pointEnddate,'yyyy-MM-dd')}">
+              소멸 예정일: 2026-08-20
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 데이터 없을 때 -->
+    <section class="history"
+             th:if="${histories == null or #lists.isEmpty(histories)}">
+      <div class="card">포인트 내역이 없습니다.</div>
+    </section>
+  </main>
+
+  <!-- 탭 필터 스크립트 -->
+  <script>
+    (function () {
+      const tabs = document.querySelectorAll('.tabs .tab');
+      const rows = () => document.querySelectorAll('.history .row');
+
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          tabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          const type = tab.dataset.filter;
+          rows().forEach(r => {
+            r.style.display = (type === 'all' || r.dataset.type === type) ? '' : 'none';
+          });
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
