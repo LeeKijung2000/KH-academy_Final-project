@@ -49,7 +49,7 @@
 ### 커뮤니티
 <img width="1564" height="651" alt="image" src="https://github.com/user-attachments/assets/6600baf2-5313-414e-8872-3d9bc9decb5e" />
 
-### 문의사항 & 대댓글
+### 문의사항
 <img width="1557" height="483" alt="image" src="https://github.com/user-attachments/assets/b74fff23-7b71-4f55-ad32-9cfaf4ddfb1b" />
 
 ### 관리자 게시판
