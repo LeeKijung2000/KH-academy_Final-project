@@ -41,13 +41,13 @@
 > 프로젝트 실행 화면 캡처 이미지 예시입니다.  
 
 ### 메인 화면
-![메인 화면](<img width="1559" height="855" alt="image" src="https://github.com/user-attachments/assets/86cba046-6fba-42ca-8d07-5355ebcd0d87" />)
+<img width="1559" height="855" alt="image" src="https://github.com/user-attachments/assets/86cba046-6fba-42ca-8d07-5355ebcd0d87" />
 
 ### 게시판 (공지사항)
-![공지사항](<img width="1552" height="509" alt="image" src="https://github.com/user-attachments/assets/ccbb2b63-03a5-4741-9866-68cea130cf90" />)
+<img width="1552" height="509" alt="image" src="https://github.com/user-attachments/assets/ccbb2b63-03a5-4741-9866-68cea130cf90" />
 
 ### 문의사항 & 대댓글
-![문의사항](<img width="1564" height="651" alt="image" src="https://github.com/user-attachments/assets/6600baf2-5313-414e-8872-3d9bc9decb5e" />)
+<img width="1564" height="651" alt="image" src="https://github.com/user-attachments/assets/6600baf2-5313-414e-8872-3d9bc9decb5e" />
 
 <img width="1557" height="483" alt="image" src="https://github.com/user-attachments/assets/b74fff23-7b71-4f55-ad32-9cfaf4ddfb1b" />
 
