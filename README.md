@@ -22,10 +22,9 @@
 - **Thymeleaf**
 - **HTML / CSS / JavaScript**
 
-### Tools & ETC
+### Tools
 - IntelliJ IDEA / Eclipse
 - Git & GitHub
-- Maven
 
 ---
 
