@@ -59,6 +59,9 @@
 ### ERD
 <img width="4520" height="2611" alt="Copy of finalProject" src="https://github.com/user-attachments/assets/911caaa6-0c01-411b-9315-2f90906c4e69" />
 
+<img width="1362" height="689" alt="image" src="https://github.com/user-attachments/assets/8517dc69-52dc-4056-93cd-6a52b013011a" />
+
+
 ---
 
 ## 👩‍💻 개발자
