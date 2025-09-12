@@ -1,6 +1,7 @@
 package itView.springboot.service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -108,5 +109,98 @@ public class ProductService {
 		RowBounds rowBounds = new RowBounds(offset, pi.getBoardLimit());
 		return mapper.getFilterProducts(rowBounds, q, categories);
 	}
+
+	public int selectReviewCount(int productNo) {
+		return mapper.selectReviewCount(productNo);
+	}
+
+	public int insertReviewAnswer(ReviewAnswer reviewAnswer) {
+		return mapper.insertReviewAnswer(reviewAnswer);
+	}
+
+	public int writeExp(ExperienceGroup expGroup) {
+		return mapper.writeExp(expGroup);
+	}
+
+	public Product selectProductDetail(Product product) {
+		return mapper.selectProductDetail(product);
+	}
+
+	public ArrayList<Question> selectQuestion(int productNo) {
+		return mapper.selectQuestion(productNo);
+	}
+
+	public ArrayList<Answer> selectAnswer(int questionNo) {
+		return mapper.selectAnswer(questionNo);
+	}
+
+	public Answer selectAnswerDetail(int questionNo) {
+		return mapper.selectAnswerDetail(questionNo);
+	}
+
+	public Question selectQuestionDetail(int questionNo) {
+		return mapper.selectQuestionDetail(questionNo);
+	}
+
+	public int insertAnswer(Answer answer) {
+		return mapper.insertAnswer(answer);
+	}
+
+	public int selectBeforeAnswerCount() {
+		return mapper.selectBeforeAnswerCount();
+	}
+
+	public int selectAfterAnswerCount() {
+		return mapper.selectAfterAnswerCount();
+	}
+
+	public int deleteAnswer(int answerNo) {
+		return mapper.deleteAnswer(answerNo);
+	}
+
+	public int editAnswer(Answer answer) {
+		return mapper.editAnswer(answer);
+	}
+
+	public ArrayList<Product> countReview(int userNo) {
+		return mapper.countReview(userNo);
+	}
+
+	public ArrayList<ExperienceGroup> selectExpGroup(int userNo) {
+		return mapper.selectExpGroup(userNo);
+	}
+
+	public ArrayList<ExperienceApplication> selectExpApp(int expNo) {
+		return mapper.selectExpApp(expNo);
+	}
+
+	public ArrayList<Order> selectMyOrderList(int userNo) {
+		return mapper.selectMyOrderList(userNo);
+	}
+
+	public ArrayList<ReviewAnswer> countReviewAnswer(int userNo) {
+		return mapper.countReviewAnswer(userNo);
+	}
+
+	public ArrayList<ReviewAnswer> selectReviewAnswer(int productNo) {
+		return mapper.selectReviewAnswer(productNo);
+	}
+
+	public int deleteReviewAnswer(int reviewAnswerId) {
+		return mapper.deleteReviewAnswer(reviewAnswerId);
+	}
+
+	public int updateExpApply(int applyNo) {
+		return mapper.updateExpApply(applyNo);
+	}
+
+	public int rejectExpApply(int applyNo) {
+		return mapper.rejectExpApply(applyNo);
+	}
+
+	public int downCoupon(HashMap<String, Integer> map) {
+		return mapper.downCoupon(map);
+	}
+
 
 }

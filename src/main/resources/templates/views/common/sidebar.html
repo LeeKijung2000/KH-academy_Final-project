@@ -25,9 +25,8 @@
 		    </div>
 		    <div class="submenu" style="display: none;">
 		        <ul>
-		            <li><a th:href="@{/inhoAdmin/ibt}"><span>●</span> IBT</a></li>
-		            <li><a th:href="@{/inhoAdmin/manageWebOrders}"><span>●</span> Manage Web Orders</a></li>
-		            <li><a th:href="@{/inhoAdmin/manageOfflineOrders}"><span>●</span> Manage Offline Orders</a></li>
+		            <li><a th:href="@{/inhoAdmin/noticeList}"><span>●</span> 전체 공지사항 목록</a></li>
+		            <li><a th:href="@{/inhoAdmin/enrollNotice}"><span>●</span> 공지사항 작성</a></li>
 		        </ul>
 		    </div>
 		
@@ -51,7 +50,7 @@
 		        <ul>
 		            <li><a th:href="@{/admin/proBoard}"><span>●</span> 판매금지 제품 보기</a></li>
 		            <li><a th:href="@{/admin/proWrite}"><span>●</span> 판매금지 제품 등록</a></li>
-		            <li><a th:href="@{/inhoAdmin/productDetail}"><span>●</span> 신고 누적 상품 관리</a></li>
+		            <li><a th:href="@{/inhoAdmin/reportProductList}"><span>●</span> 신고 상품 목록</a></li>
 		        </ul>
 		    </div>
 		
@@ -72,7 +71,10 @@
 		    </div>
 		    <div class="submenu" style="display: none;">
 		        <ul>
-		            <li><a th:href="@{/admin/report}"><span>●</span> 신고게시판</a></li>
+		            <li><a th:href="@{/admin/rUser}"><span>●</span> 회원 신고게시판</a></li>
+		            <li><a th:href="@{/admin/rBoard}"><span>●</span> 커뮤니티 글 신고게시판</a></li>
+		            <li><a th:href="@{/admin/rReview}"><span>●</span> 리뷰 신고게시판</a></li>
+		            <li><a th:href="@{/admin/rReply}"><span>●</span> 댓글 신고게시판</a></li>
 		        </ul>
 		    </div>
 		
@@ -83,9 +85,9 @@
 		    <div class="submenu" style="display: none;">
 		        <ul>
 		            <li><a th:href="@{/inhoAdmin/couponList}"><span>●</span> 쿠폰 목록</a></li>
+		            <li><a th:href="@{/inhoAdmin/enrollCoupon}"><span>●</span> 쿠폰 등록</a></li>
 		            <li><a th:href="@{/inhoAdmin/couponBoardList}"><span>●</span> 쿠폰 공지 목록</a></li>
 		            <li><a th:href="@{/inhoAdmin/enrollCouponNotice}"><span>●</span> 쿠폰 공지 등록</a></li>
-		            <li><a th:href="@{/inhoAdmin/enrollCoupon}"><span>●</span> 쿠폰 등록</a></li>
 		        </ul>
 		    </div>
 		
@@ -97,7 +99,6 @@
 		        <ul>
 		            <li><a th:href="@{/inhoAdmin/pointList}"><span>●</span> 포인트 목록</a></li>
 		            <li><a th:href="@{/inhoAdmin/enrollPoint}"><span>●</span> 포인트 등록</a></li>
-		            <li><a th:href="@{/inhoAdmin/updatePoint}"><span>●</span> 포인트 수정</a></li>
 		        </ul>
 		    </div>
 		</div>

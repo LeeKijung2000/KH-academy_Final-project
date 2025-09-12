@@ -3,23 +3,28 @@ package itView.springboot.controller;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import itView.springboot.service.InhoService;
+import itView.springboot.vo.Report;
+import itView.springboot.vo.User;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/login")
+@RequestMapping({"/login", "/inhoAdmin"})
 @RequiredArgsConstructor
 public class InhoRestController {
 	
     private final InhoService uService;
     private final JavaMailSender mailSender;
     
+ 
     // 아이디 중복 확인
  	@GetMapping("checkId")
  	public int checkValue(@RequestParam("userId") String userId) {
@@ -89,5 +94,6 @@ public class InhoRestController {
 		
 		return random;
  	}
+ 	
 
 }

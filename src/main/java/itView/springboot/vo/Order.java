@@ -1,6 +1,8 @@
 package itView.springboot.vo;
 
-import java.sql.Date;
+import java.time.LocalDate;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +14,8 @@ import lombok.Setter;
 public class Order {
 	private int orderNo;
 	private int orderTargetNo;
-	private Date orderDate;
+	private LocalDate orderDate;
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private int orderCount;
 	private String orderStatus;
 	private String paymentMethod;
@@ -24,10 +27,16 @@ public class Order {
 	private int userNo;
 	private int personalCouponNo;
 	
+	private int productNo;
 	private String productName;
 	private int productPrice;
+	private int productStock;
+	private String productState;
+	private String productCompany;
 	
 	private String userPhone;
 	private String userAddress;
 	private String userName;
+	
+	private String attmRename;
 }

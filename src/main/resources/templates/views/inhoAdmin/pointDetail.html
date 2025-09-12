@@ -21,58 +21,63 @@
 	        <div class="content-area">
 	            <!-- header 조각 삽입 -->
 	            <div th:replace="~{common/header2 :: header2}"></div>
+	            
                 <div class="main-content">
-                    <h2 class="page-title">결제 상세 정보</h2>
-                    <table class="detail-table">
+                    <h2 class="page-title">포인트 상세 정보</h2>
+                    <form id="detailForm" method="get" th:action="@{/inhoAdmin/updatePoint}">
+                    	<input type="hidden" name="pointNo" th:value="${p.pointNo}">
+                    	<input type="hidden" name="page" th:value="${page}">
+                    	<table class="detail-table">
                         <tr>
-                            <th>주문번호</th>
-                            <td>#0003</td>
+                            <th>포인트 번호</th>
+                            <td>[[${p.pointNo}]]</td>
                         </tr>
                         <tr>
-                            <th>품목/수량</th>
-                            <td>참치캔 / 30개</td>
+                            <th>포인트 이름</th>
+                            <td>[[${p.pointName}]]</td>
                         </tr>
                         <tr>
-                            <th>구매자</th>
-                            <td>이루강</td>
+                            <th>상세설명</th>
+                            <td>[[${p.pointDescription}]]</td>
                         </tr>
                         <tr>
-                            <th>배송지</th>
-                            <td>서울시 중구</td>
+                            <th>포인트 크기</th>
+                            <td>[[${p.pointValue}]]</td>
                         </tr>
                         <tr>
-                            <th>결제수단</th>
-                            <td>신용카드</td>
+                            <th>포인트 등록일</th>
+                            <td>[[${p.pointCreatedate}]]</td>
                         </tr>
                         <tr>
-                            <th>결제상태</th>
-                            <td><span class="status paid">결제완료</span></td>
-                        </tr>
-                        <tr>
-                            <th>쿠폰적용</th>
-                            <td>X</td>
-                        </tr>
-                        <tr>
-                            <th>총 가격</th>
-                            <td>140,000원</td>
-                        </tr>
-                        <tr>
-                            <th>배송상태</th>
-                            <td class="delivery-status">
-                                <label><input type="radio" name="delivery" value="ready" checked /> 배송준비중</label>
-                                <label><input type="radio" name="delivery" value="shipped" /> 배송중</label>
-                                <label><input type="radio" name="delivery" value="completed" /> 배송완료</label>
-                            </td>
+                            <th>포인트 소멸일</th>
+                            <td>[[${p.pointEnddate}]]</td>
                         </tr>
                     </table>
-
                     <div class="form-actions">
                         <button class="btn-submit">수정</button>
-                        <button class="btn-reset" onclick="history.back()">취소</button>
+                        <button type="button" id="deleteBtn" class="btn-reset">삭제</button>
+                        <button type="button" class="btn-reset" onclick="history.back()">취소</button>
                     </div>
+                    </form>
                 </div>
             </div>
         </div>
-        <script th:src="@{/js/inhoAdmin/sidebar.js}"></script>
+		<script th:src="@{/js/inhoAdmin/sidebar.js}"></script>
+		<script>
+			window.onload = () => {
+			    const delBtn = document.getElementById('deleteBtn');
+			    const form = document.getElementById('detailForm');
+	
+			    if (delBtn) {
+			        delBtn.addEventListener('click', () => {
+			            if (confirm("정말 포인트를 삭제하시겠습니까?")) {
+			            	form.method = "post";
+			                form.action = '/inhoAdmin/deletePoint';
+			                form.submit();
+			            }
+			        });
+			    }
+			}
+		</script>
     </body>
 </html>

@@ -1,6 +1,7 @@
 package itView.springboot.service;
 
 import java.io.File;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +17,7 @@ import itView.springboot.vo.Coupon;
 import itView.springboot.vo.PageInfo;
 import itView.springboot.vo.Point;
 import itView.springboot.vo.Product;
+import itView.springboot.vo.Report;
 import itView.springboot.vo.User;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -38,12 +40,12 @@ public class InhoService {
 		return mapper.checkId(userId);
 	}
 
-	public void enrollCouponNotice(Board b, String uploadedFiles, HttpSession session) {
+	public void enrollNotice(Board b, String uploadedFiles, HttpSession session) {
 		 User user = (User)session.getAttribute("loginUser");
 	        b.setUserNo(user.getUserNo());
 
 	        // 게시글 저장 → boardId 생성
-	        mapper.enrollCouponNotice(b);
+	        mapper.enrollNotice(b);
 	        int boardId = b.getBoardId();
 
 	        if (uploadedFiles != null && !uploadedFiles.isEmpty()) {
@@ -133,7 +135,6 @@ public class InhoService {
 	}
 
 	public int updateCouponBoard(Board b) {
-		System.out.println(b.getBoardContent());
 		return mapper.updateCouponBoard(b);
 	}
 
@@ -206,7 +207,107 @@ public class InhoService {
 	}
 
 	public ArrayList<Product> selectRankingList(HashMap<String, String> map) {
-		return mapper.selectRankingList(map);
+		ArrayList<Product> list = mapper.selectRankingList(map);
+
+        // 썸네일 세팅
+        for (Product p : list) {
+            String thumbnail = mapper.selectThumbnail(p.getProductNo());
+            p.setFirstImage(thumbnail);
+        }
+
+        return list;
 	}
+
+	public Point selectPoint(int pNo) {
+		Point p = mapper.selectPoint(pNo);
+		return p;
+	}
+
+	public int getNoticeCount(HashMap<String, String> map) {
+		return mapper.getNoticeCount(map);
+	}
+
+	public ArrayList<Board> selectNoticeList(PageInfo pi, HashMap<String, String> map) {
+		int offset = (pi.getCurrentPage()-1) * pi.getBoardLimit();
+		RowBounds rowBounds = new RowBounds(offset, pi.getBoardLimit());
+		return mapper.selectNoticeList(map, rowBounds);
+	}
+
+	public int deleteNotice(int bId) {
+		return mapper.deleteNotice(bId);
+	}
+
+	public int deleteCoupon(int cNo) {
+		return mapper.deleteCoupon(cNo);
+	}
+
+	public int deletePoint(int pNo) {
+		return mapper.deletePoint(pNo);
+	}
+
+	public int updateNotice(Board b) {
+		return mapper.updateNotice(b);
+	}
+
+	public Board selectNotice(int bId) {
+		Board b = mapper.selectNotice(bId);
+		return b;
+	}
+
+	public Product selectProduct(int pNo) {
+		Product p = mapper.selectProduct(pNo);
+		return p;
+		
+	}
+
+	public int getReportProductCount(HashMap<String, String> map) {
+		return mapper.getReportProductCount(map);
+	}
+
+	public ArrayList<Product> selectReportProductList(PageInfo pi, HashMap<String, String> map) {
+		int offset = (pi.getCurrentPage()-1) * pi.getBoardLimit();
+		RowBounds rowBounds = new RowBounds(offset, pi.getBoardLimit());
+		return mapper.selectReportProductList(map, rowBounds);
+	}
+
+	public Product selectReportProduct(int pNo) {
+		Product p = mapper.selectReportProduct(pNo);
+		String thumbnail = mapper.selectThumbnail(p.getProductNo());
+        p.setFirstImage(thumbnail);
+		return p;
+	}
+
+//	public Report selectReport(int pNo) {
+//		Report r = mapper.selectReport(pNo);
+//		return r;
+//	}
+
+	public int getReportCount(int pNo) {
+		return mapper.getReportCount(pNo);
+	}
+
+	public ArrayList<Report> selectReportList(PageInfo pi, int pNo) {
+		int offset = (pi.getCurrentPage()-1) * pi.getBoardLimit();
+		RowBounds rowBounds = new RowBounds(offset, pi.getBoardLimit());
+		return mapper.selectReportList(pNo, rowBounds);
+	}
+
+	public int updateReportModifyDate(Map<String, Object> map) {
+		return mapper.updateReportModifyDate(map);
+	}
+
+	public int updateProductState(int productNo) {
+		return mapper.updateProductState(productNo);
+	}
+	
+	public void activateExpiredProducts(LocalDate today) {
+		mapper.activateProducts(today);
+	}
+
+	public int enrollReport(Report r) {
+		return mapper.enrollReport(r);
+	}
+	
+	
 
 }

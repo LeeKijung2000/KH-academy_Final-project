@@ -58,13 +58,7 @@ input[type="checkbox"]:indeterminate {
 	margin-top: 1%;
 }
 
-.delete-btn {
-	float: right;
-	background: none;
-	border: none;
-	color: gray;
-	font-size: 15px;
-}
+
 
 .delete-btn:hover {
 	color: black;
@@ -92,14 +86,27 @@ input[type="checkbox"]:indeterminate {
 	display: flex;
 	align-items: center;
 	gap: 10px;
-	margin-right: 3%;
-	margin-left: 3%;
+	margin-right: 1%;
+	position:relative;
+	margin-left: 1%;
+	margin-bottom:1%;
+	margin-top:2%;
+}
+
+.delete-btn {
+  position: absolute;
+  top: 0;   
+  right:0 ; 
+  background: none;
+  border: none;
+  color: gray;
+  font-size: 15px;
+  cursor: pointer;
 }
 
 .item-image {
 	width: 130px;
 	height: 130px;
-	background: #ccc;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -107,6 +114,31 @@ input[type="checkbox"]:indeterminate {
 	margin-right: 10px;
 	margin-bottom: 10px;
 	border-radius: 6px;
+	position: relative;
+}
+.soldout {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5);   
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;               
+}
+.unavailable {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5);   
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;               
 }
 
 .quantity {
@@ -116,8 +148,13 @@ input[type="checkbox"]:indeterminate {
 .item-name {
 	font-size: 18px;
 	color: gray;
-	font-size: 18px;
 }
+.item-name a {
+  text-decoration: none; 
+  color: inherit;  
+  font-size: 18px;      
+}
+
 
 .item-price {
 	color: #8ad8f0;
@@ -161,6 +198,7 @@ select[name="coupon-option"] {
 	width: 30%;
 	border: 1px solid #34e5eb;
 	border-radius: 6px;
+	overflow:hidden;
 }
 
 .coupon {
@@ -170,7 +208,13 @@ select[name="coupon-option"] {
 	margin: 5px 0;
 	font-size: 18px;
 }
-
+#sort option:disabled{
+	background-color:#e0e0e0;
+	color:white;
+}
+#sort option:not(:disabled){
+	font-weight:bold;
+}
 .total {
 	display: flex;
 	justify-content: space-between;
@@ -212,7 +256,11 @@ select[name="coupon-option"] {
 .point-amount {
 	color: gray;
 }
-
+.point-note{
+	font-size:13px;
+	font-style:italic;
+	color:#d9d9d9;
+}
 #product-order {
 	display: block;
 	width: 100%;
@@ -285,14 +333,12 @@ select[name="coupon-option"] {
 </head>
 <body>
 	<!-- 전역 헤더 (공통) -->
-	<header class="site-header">
-		<a href="index">It:View</a>
-	</header>
+	<header class="site-header">It:View</header>
 
 	<!-- 전역 사이드바 (공통) : 아이콘 구조로 교체 -->
 	<nav class="sidenav" aria-label="Primary">
 		<div class="sidenav-top">
-			<a class="nav-item active" href="/my/myInfo"><i
+			<a class="nav-item active" href="/my/myPage"><i
 				class="fa-solid fa-user"></i><span>마이페이지</span></a> <a class="nav-item"
 				href="/experience/experienceApplication"><i
 				class="fa-solid fa-gift"></i><span>체험단 신청</span></a> <a class="nav-item"
@@ -313,95 +359,84 @@ select[name="coupon-option"] {
 		<div th:if="${#lists.isEmpty(clist)}" class="cart-empty">
    			<p>장바구니가 비어 있습니다.</p>
 		</div>
-		<div class="cartitem" th:if="${!#lists.isEmpty(clist)}" th:each="c:${clist}">
+		<div class="cartitem" th:if="${!#lists.isEmpty(clist)}"
+			th:each="gc:${cartGroup}">
+			
+			
+			
 			<div class="cart-header">
-				<label><input type="checkbox" class="checkItem"
-					th:value="${c.cartNo}">[[${c.productCompany}]]</label>
-				<button type="button" class="delete-btn"
-					th:data-cartno="${c.cartNo}">X</button>
+				<label><input type="checkbox" class="checkcompany"
+					 th:data-company="${gc.key}" >[[${gc.key}]]</label>
+
 			</div>
-			<div class="cart-body">
+			
+			<div  class="cart-body" th:each="c : ${gc.value}">
+				<label><input type="checkbox" class="checkItem" th:data-price="${c.productPrice}"
+					th:value="${c.cartNo}" th:data-company="${gc.key}" th:disabled="${c.productStock == 0 or c.productState == 'N'}"></label>
 				<div class="item-image">
-					<img th:each="a:${alist}" th:if="${a.positionNo==c.productNo}"
-						th:src="@{/uploadFilesFinal/{file}(file=${a.attmRename})}"
+					<a th:href="@{/Shopping/detail(productNo=${c.productNo})}">
+						<img th:each="a:${alist}" th:if="${a.positionNo==c.productNo}"
+						th:src="@{/} + ${a.attmRename}"
 						width="100%" height="100%" style="border-radius: 8px;" />
+					</a>
+					<div th:if="${c.productStock == 0 && c.productState =='Y'}" class="soldout">
+    					품절
+  					</div>
+  					<div th:if="${c.productState == 'N'}" class="unavailable">
+    					판매중지
+  					</div>
 				</div>
+				
 				<div class="item">
 					<div class="item-price" th:data-price="${c.productPrice}"
 						th:text="${#numbers.formatInteger(c.productPrice * c.amount,3,'COMMA')}+'원'">가격</div>
-					<div class="item-name" th:text="${c.productName}">이름</div>
+					<div class="item-name">
+						<a th:href="@{/Shopping/detail(productNo=${c.productNo})}">
+							<span th:text="${c.productName}">이름</span>
+						</a>
+					</div>
 
 					<div class="quantity">
 						<button class="qty-btn minus" type="button">-</button>
 						<span th:text="${c.amount}" class="qty"
-							th:data-stock="${c.productStock}">갯수</span>
+							th:data-stock="${c.productStock}"
+     						th:data-state="${c.productState}">갯수</span>
 						<button class="qty-btn plus" type="button">+</button>
 					</div>
 				</div>
+				<button type="button" class="delete-btn"
+					th:data-cartno="${c.cartNo}">X</button>
 			</div>
-		</div>
-		<div class="cartitem">
-			<div class="cart-header">
-				<label><input type="checkbox" class="checkItem"> 브랜드
-					이름 1</label>
-				<button class="delete-btn">X</button>
 			</div>
-			<div class="cart-body">
-				<div class="item-image">품절</div>
-				<div class="item">
-					<div class="item-price">(상품가격)</div>
-					<div class="item-name">상품이름</div>
-					<div class="quantity">
-						<button class="qty-btn minus">-</button>
-						<span>1</span>
-						<button class="qty-btn plus">+</button>
-					</div>
-				</div>
+		
 
-			</div>
-			<div class="cart-header">
-				<label><input type="checkbox" class="checkItem"></label>
-				<button class="delete-btn" type="button">X</button>
-			</div>
-			<div class="cart-body">
-				<div class="item-image">품절</div>
-				<div class="item">
-					<div class="item-price">(상품가격)</div>
-					<div class="item-name">상품이름</div>
-					<div class="quantity">
-						<button class="qty-btn minus">-</button>
-						<span>1</span>
-						<button class="qty-btn plus">+</button>
-					</div>
-				</div>
-
-			</div>
-
-		</div>
+	
+		
 		<hr>
 		<div class="payment">
 			<p class="predict">예상결제금액</p>
 
 			<div class="total">
 				<p class="total-price">총 상품금액</p>
-				<p class="total-product" style="color: black;">(상품만가격)</p>
+				<p class="total-product" style="color: black;">0원</p>
 			</div>
 			<div class="coupon">
 				<p class="coupon-notice">쿠폰할인</p>
-				<select id="sort" name="coupon-option">
-					<option value="notice" selected>쿠폰을 선택해주세요</option>
-					<option value="all" th:each="coupon:${couponlist}"
-										th:attr="data-brand=${coupon.">[[${coupon.couponName}]]</option>
-					
+				<select id="sort" name="coupon-option" th:data-usergrade="${loginUser.userGrade}">
+					<option value="notice" disabled selected>쿠폰을 선택해주세요</option>
+					<option value="none">선택안함</option>
+					<option value="all" th:each="cp:${couponlist}" th:value="${cp.personalCouponNo}"
+										th:attr="data-minprice=${cp.couponMinprice},data-start=${cp.couponStartdate},data-brand=${cp.brandName != null ? cp.brandName:''} ,
+												data-end=${cp.couponEnddate},data-disc=${cp.couponDiscount},data-coupontarget=${cp.couponTarget}">[[${cp.couponName}]] (할인율:[[${cp.couponDiscount}]]%, 최소주문금액:[[${#numbers.formatInteger(cp.couponMinprice,3,'COMMA')}]]원)</option>
 				</select>
 			</div>
 			<div class="total">
 				<p class="total-coupon">총 주문금액</p>
-				<p class="total-discount-price" style="color: black;">(쿠폰적용한가격)</p>
+				<p class="total-discount-price" style="color: black;">0원</p>
 			</div>
 			<div class="point">
-				<p class="point-exception">예상 적립 포인트</p>
-				<p class="point-amount" style="color: black;">(포인트 적립)</p>
+				<p class="point-exception">예상 적립 포인트<br><span class="point-note">* 주문 금액의 1%가 적립됩니다.</span></p>
+				<p class="point-amount" style="color: black;">0원</p>
 			</div>
 		</div>
 		<button type="submit" id="product-order">상품 주문하기</button>
@@ -413,71 +448,233 @@ select[name="coupon-option"] {
 		const items = document.querySelectorAll('.checkItem');
 		const checkdelete = document.getElementById('checkdelete');
 		const deleteBtn = document.querySelectorAll('.delete-btn');
+		const checkCompany = document.querySelectorAll('.checkcompany');
+		
 		
 		const minusBtn = document.querySelectorAll('.qty-btn.minus');
 		const plusBtn=document.querySelectorAll('.qty-btn.plus');
 		const qtySpan=document.querySelectorAll('.qty');
 		
 		const itemPrice=document.querySelectorAll('.item-price');
+		const cartBodies = document.querySelectorAll('.cart-body');
 		const cartItem=document.querySelectorAll('.cartitem');
 		const totalProduct = document.querySelector('.total-product');
+		const totalDiscountPrice=document.querySelector('.total-discount-price');
 		
-		if(all != null){
-			all.addEventListener('change',()=>{
-				for(let i =0; i<items.length; i++){
-					items[i].checked=all.checked;
+		const couponDiscount=document.getElementById('sort');
+		const pointreward=document.querySelector('.point-amount');
+		const productOrder=document.querySelector('.product-order');
+		
+		
+		
+		const normalizeKey=(value)=>{
+			if(!value)return "";
+			return value.trim().toLowerCase();
+		}
+
+		const updateTotal = () => {
+	        let sum = 0;
+	        items.forEach(check => {
+	            if (check.checked && !check.disabled) {
+	                const productBox = check.closest('.cart-body');   // 체크박스가 속한 상품
+	                const productPriceBox = productBox.querySelector('.item-price');
+	                const productQty = productBox.querySelector('.qty');
+
+	                const unit = parseInt(productPriceBox.dataset.price); 
+	                const qty  = parseInt(productQty.textContent);
+
+	                sum += unit * qty;
+	            }
+	        });
+	        totalProduct.textContent = sum.toLocaleString() + '원';
+	    };
+	    
+	    
+	    
+		
+		const selectCheckProduct=()=>{
+			let total=0;
+			let sellerMap={};
+			
+			items.forEach(check=>{
+				if(check.checked && !check.disabled){
+					const productBox = check.closest('.cart-body');   
+	                const productPriceBox = productBox.querySelector('.item-price');
+	                const productQty = productBox.querySelector('.qty');
+
+	                const unit = parseInt(productPriceBox.dataset.price); 
+	                const qty  = parseInt(productQty.textContent);
+					const sellerKey=check.dataset.company.toLowerCase();
+					
+	                total += unit * qty;
+	                
+	                
+	                if(sellerMap[sellerKey]==undefined){
+	                	sellerMap[sellerKey]=0;
+	                }
+	                sellerMap[sellerKey]=sellerMap[sellerKey]+(unit*qty);
 				}
-				all.indeterminate = false;
-				
-				let sum=0;
-				cartItem.forEach(product=>{
-					if(product.querySelector('.checkItem').checked){
-						const unit = parseInt(product.querySelector('.item-price').dataset.price);
-						const qty=parseInt(product.querySelector('.qty').textContent);
-						sum+=unit*qty;
-					}
-				});
-				
-				totalProduct.textContent=sum.toLocaleString()+'원';
 			});
 			
-			items.forEach(check =>{
-				check.addEventListener('change',()=>{
-					const total = items.length;
-					//item에 들어잇는 개별 체크박스들 중에서 체크된 것만 골라서 그 개수를 셈
-					// [...]->이게 nodelist를 배열로 변환하는것 
-					//filer-> 배열을 훑으면서 조건을 통과하는 요소만 모아서 새 배열을 반환 
-					//즉 체크된 박스들만 걸러서 배열로 만든다
-					const checked = [...items].filter(c=>c.checked).length;
-					
-					all.checked=(checked===total);
-					
-					//일부만 선택된 상태면 '전체선책'체크박스를 회색 상태로 만든다
-					//indeterminate는 js에만 잇는 요소
-					//체크된개수 > 0(적어도 하나는 체크됨), 체크된 개수<total(일부만)->일부만 체크되면 true
-					all.indeterminate=(checked>0 && checked < total);
-					
-					let sum=0;
-					cartItem.forEach(product=>{
-						if(product.querySelector('.checkItem').checked){
-							const unit = parseInt(product.querySelector('.item-price').dataset.price);
-							const qty=parseInt(product.querySelector('.qty').textContent);
-							sum+=unit*qty;
-						}
-					});
-					
-					totalProduct.textContent=sum.toLocaleString()+'원';
-				});
-			})
+			return{total,sellerMap};
+		};
+		
+		
+		const couponActivation=()=>{
 			
-		}
+			const {total,sellerMap}=selectCheckProduct();
+			const selectBox =document.getElementById("sort");
+			const options=document.querySelectorAll("option");
+			const userGrade=(selectBox.dataset.usergrade || "").toLowerCase();
+			
+			
+			
+			options.forEach(opt=>{
+				if(opt.value!="notice" && opt.value!='none')opt.disabled=true;
+				
+				
+			});
+			
+			if(total==0)return;
+			
+			options.forEach(opt=>{
+				
+				if (opt.value == "notice" || opt.value=='none') return;
+				const min=parseInt(opt.dataset.minprice || 0);
+				const target=(opt.dataset.coupontarget||"").toLowerCase();
+				const brand=(opt.dataset.brand||"").toLowerCase();
+				
+				let useCoupon=false;
+				
+				if(!brand){
+					if((target=="all" || target==userGrade) && total >= min){
+						useCoupon=true;
+					}
+				}else{
+					const brandSum=sellerMap[brand] || 0;
+					if(brandSum>=min){
+						useCoupon=true;
+					}
+				}
+				
+				opt.disabled =!useCoupon;
+			});
+		};
+		
+		
+		const applyCoupon=()=>{
+			const {total}=selectCheckProduct();
+			let finalPrice=total;
+			
+			const selectCoupon=couponDiscount.options[couponDiscount.selectedIndex];
+			
+			if(total==0){
+				totalProduct.textContent="0원";
+				totalDiscountPrice.textContent="";
+				pointreward.textContent="";
+			}
+			
+			if(!selectCoupon || selectCoupon.value=='none'){
+				totalDiscountPrice.textContent=finalPrice.toLocaleString()+'원';
+				pointreward.textContent=Math.floor(finalPrice*0.01).toLocaleString()+ '원';
+				
+				return;
+			}
+			
+			const discountRate=parseInt(selectCoupon.dataset.disc || 0);
+			const minPrice=parseInt(selectCoupon.dataset.minprice || 0);
+			
+			if(total>=minPrice){
+				const discount =Math.floor(total*(discountRate/100));
+				finalPrice=total-discount;
+			}else{
+				finalPrice=total;
+			}
+			 totalDiscountPrice.textContent = finalPrice.toLocaleString() + '원';
+		
+			
+			const point=Math.floor(finalPrice*0.01);
+			pointreward.textContent=point.toLocaleString()+"원";
+		};
+		
+		
+	    checkCompany.forEach(chkbrd => {
+	        chkbrd.addEventListener('change', () => {
+	            const company = chkbrd.dataset.company;
+	            items.forEach(item => {
+	                if (item.dataset.company === company && !item.disabled) {
+	                    item.checked = chkbrd.checked;
+	                }
+	            });
+	            const enabledItems = [...items].filter(i => !i.disabled);
+	            const total = enabledItems.length;
+	            const checked = enabledItems.filter(c => c.checked).length;
+
+	            all.checked = (checked === total);
+	            all.indeterminate = (checked > 0 && checked < total);
+
+	            updateTotal();
+	            
+	    		couponActivation();
+	    		applyCoupon();
+	        });
+	    });
+
+	    if(all != null){
+	        all.addEventListener('change',()=>{
+	            items.forEach(item=>{
+	                if(!item.disabled){
+	                    item.checked = all.checked;
+	                }
+	            });
+
+	            checkCompany.forEach(chkbrd=>{
+	                chkbrd.checked = all.checked;
+	                chkbrd.indeterminate = false;
+	            });
+
+	            all.indeterminate = false;
+
+	            updateTotal();
+	            
+	    		couponActivation();
+	    		applyCoupon();
+	        });
+
+	        // 개별 체크박스 이벤트
+	        items.forEach(check =>{
+	            check.addEventListener('change',()=>{
+	                
+	            	const enabledItems = [...items].filter(i => !i.disabled);
+	            	const total = enabledItems.length;
+	                const checked = enabledItems.filter(c=>c.checked).length;
+	                const company = check.dataset.company;
+	                const companyCheckbox = [...checkCompany].find(cb => cb.dataset.company === company);
+	                const companyItems = [...items].filter(i => i.dataset.company === company);
+	                const checkedCount = companyItems.filter(i => i.checked).length;
+
+	                companyCheckbox.checked = (checkedCount === companyItems.length);
+	                companyCheckbox.indeterminate = (checkedCount > 0 && checkedCount < companyItems.length);
+
+	                all.checked = (checked === total);
+	                all.indeterminate = (checked > 0 && checked < total);
+
+	                updateTotal();
+	                
+	        		couponActivation();
+	        		applyCoupon();
+	            });
+	        });
+	    }
+		
+		
 		
 		if(checkdelete != null){
 			checkdelete.addEventListener('click',()=>{
 				const checkedItems=[];
 				
 				for(let i =0; i<items.length; i++){
-					if(items[i].checked){
+					if(items[i].checked && !items[i].disabled){
 						checkedItems.push(items[i].value);
 					}
 				}
@@ -544,6 +741,14 @@ select[name="coupon-option"] {
 		qtySpan.forEach((span,i)=>{
 			const qty=parseInt(span.textContent);
 			const stock=parseInt(qtySpan[i].dataset.stock);
+			const state=span.dataset.state;
+			
+			if(stock==0 || state=='N'){
+				minusBtn[i].disabled=true;
+				plusBtn[i].disabled=true;
+			}
+			
+			
 			if(qty===1){
 				minusBtn[i].disabled=true;
 			}
@@ -552,85 +757,112 @@ select[name="coupon-option"] {
 			}
 		});
 		
+		 minusBtn.forEach((btn,i)=>{
+		        btn.addEventListener('click',()=>{
+		            const productBox = cartBodies[i];
+		            const productQty = productBox.querySelector('.qty');
+		            const productPriceBox = productBox.querySelector('.item-price');
+
+		            let qty = parseInt(productQty.textContent);
+		            const stock = parseInt(productQty.dataset.stock);
+
+		            if(qty > 1){
+		                qty--;
+		                productQty.textContent = qty;
+		            }
+
+		            btn.disabled = (qty === 1);
+		            if(qty < stock) plusBtn[i].disabled = false;
+
+		            const unit = parseInt(productPriceBox.dataset.price); 
+		            const total = unit * qty;
+		            productPriceBox.textContent = total.toLocaleString()+'원';
+
+		            updateTotal();
+		            
+		    		couponActivation();
+		    		applyCoupon();
+		        });
+		    });
+		
+		 plusBtn.forEach((btn,i)=>{
+		        btn.addEventListener('click',()=>{
+		            const productBox = cartBodies[i];
+		            const productQty = productBox.querySelector('.qty');
+		            const productPriceBox = productBox.querySelector('.item-price');
+
+		            let qty = parseInt(productQty.textContent);
+		            const stock = parseInt(productQty.dataset.stock);
+
+		            if(qty < stock){
+		                qty++;
+		                productQty.textContent = qty;
+
+		                if(qty === 1){
+		                    minusBtn[i].disabled = true;
+		                } else {
+		                    minusBtn[i].disabled = false;
+		                }
+
+		                const unit = parseInt(productPriceBox.dataset.price); 
+		                const total = unit * qty;
+		                productPriceBox.textContent = total.toLocaleString()+'원';
+		            } else {
+		                alert('상품이 더 이상 존재하지 않습니다. 😅');
+		            }
+
+		            if(qty === stock){
+		                alert('마지막 상품입니다.');
+		                btn.disabled = true;
+		            }
+
+		            updateTotal();
+		            
+		    		couponActivation();
+		    		applyCoupon();
+		        });
+		    });
+		 
+		 couponDiscount.addEventListener('change',()=>{
+			applyCoupon(); 
+		 });
 		
 		
-		minusBtn.forEach((btn,i)=>{
-			btn.addEventListener('click',()=>{
-				let qty=parseInt(qtySpan[i].textContent);
-				const stock=parseInt(qtySpan[i].dataset.stock);
-				if(qty>1){
-					qty=qty-1;
-					qtySpan[i].textContent=qty;
-				}
+		couponActivation();
+		 
+		
+		
+		productOrder.addEventListener('click',()=>{
+				const checkedItems=[];
 				
-				if(qty===1){
-					btn.disabled=true;
-				}else{
-					btn.disabled=false;
-				}
-				
-				if(qty<stock){
-					plusBtn[i].disabled=false;
-				}
-				
-				const item=parseInt(itemPrice[i].dataset.price);
-				const total=item * qty;
-				itemPrice[i].textContent=total.toLocaleString()+'원'
-				
-				let sum=0;
-				cartItem.forEach(product=>{
-					if(product.querySelector('.checkItem').checked){
-						const unit = parseInt(product.querySelector('.item-price').dataset.price);
-						const qty=parseInt(product.querySelector('.qty').textContent);
-						sum+=unit*qty;
+				for(let i =0; i<items.length; i++){
+					if(items[i].checked){
+						checkedItems.push(items[i].value);
 					}
+				}
+				
+				if(checkedItems.length === 0){
+					alert('주문할 상품을 선택하세요.');
+					return;
+				}
+				if(confirm('선택한 상품을 주문하시겠습니까?')){
+				$.ajax({
+					url:'/Shopping/cartToOrder',
+					type:'post',
+					traditional:true,
+					data:{cartNo:checkedItems},
+					success: data =>{
+						if(data > 0){
+							location.reload();
+						}else{
+							alert('상품 주문 중 오류가 발생했습니다.');
+						}
+					},
+					error:data => console.log(data)
 				});
-				
-				totalProduct.textContent=sum.toLocaleString()+'원';
-				
-			});
-		});
-		
-		plusBtn.forEach((btn,i)=>{
-			btn.addEventListener('click',()=>{
-				let qty=parseInt(qtySpan[i].textContent);
-				const stock=parseInt(qtySpan[i].dataset.stock);
-				
-				if(qty<stock){
-					qty=qty+1;
-					qtySpan[i].textContent=qty;
-					
-					if(qty===1){
-						minusBtn[i].disabled=true;
-					}else{
-						minusBtn[i].disabled=false;
-					}
-					const item=parseInt(itemPrice[i].dataset.price);
-					const total=item * qty;
-					itemPrice[i].textContent=total.toLocaleString()+'원'
-				}else{
-					alert('상품이 더 이상 존재하지 않습니다. 😅');
 				}
-				
-				if(qty===stock){
-					alert('마지막 상품입니다.');
-					btn.disabled=true;
-				}
-				let sum=0;
-				cartItem.forEach(product=>{
-					if(product.querySelector('.checkItem').checked){
-						const unit = parseInt(product.querySelector('.item-price').dataset.price);
-						const qty=parseInt(product.querySelector('.qty').textContent);
-						sum+=unit*qty;
-					}
-				});
-				
-				totalProduct.textContent=sum.toLocaleString()+'원';
 			});
 			
-			
-		});
-		
 		
 		
 	}

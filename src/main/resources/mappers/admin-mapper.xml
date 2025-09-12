@@ -36,11 +36,16 @@ select count(*)
 <select id="selectUserList" resultType="itView.springboot.dto.UserReport">
 	select * 
     from (
-        select u.user_no, u.user_id, u.email, u.user_type, u.brand_name, u.user_status,
+        select 
+        	u.user_no, u.user_id, u.email, u.user_type, 
+        	u.brand_name, u.user_status,
                count(r.report_no) as reportCount
         from "USER" u
-        left join REPORT r on u.user_no = r.reporter_user_id
-        group by u.user_no, u.user_id, u.email, u.user_type, u.brand_name, u.user_status)t
+        left join REPORT r 
+        	on u.user_no = r.reporter_user_id
+        	and r.report_type = 'U'
+        group by 
+        	u.user_no, u.user_id, u.email, u.user_type, u.brand_name, u.user_status)t
 	<if test="value != null and value != ''">
 		<choose>
 			<when test="condition == 'userId'">
@@ -63,76 +68,300 @@ select count(*)
 </select>
 
 <select id="selectUser" parameterType="int" resultType="itView.springboot.dto.UserReport">
-	select * from "USER" where user_no = #{userNo}
+SELECT 
+    u.user_no,
+    u.user_id,
+    u.email,
+    u.user_type,
+    u.brand_name,
+    u.user_status,
+    COUNT(r.report_no) AS reportCount
+FROM "USER" u
+LEFT JOIN REPORT r 
+    ON u.user_no = r.reporter_user_id
+    AND r.report_type = 'U'
+WHERE u.user_no = #{userNo}
+GROUP BY 
+    u.user_no, u.user_id, u.email, u.user_type, u.brand_name, u.user_status
 </select>
 
 
-<!-- 신고부분
-	(1)신고회원리스트 조회 -->
-<select id="getReportListCount" resultType="int">
+<!-- 신고게시판 조회 -->
+<select id="getReportListCount1" resultType="int">
 select count(*) 
-    from report r
-    	join "USER" u on r.reporter_user_id = u.user_no
-	 <if test="value != null and value != ''">
-		<choose>
-			<when test="condition == 'reportTitle'">
-				where upper(report_title) like '%' || upper(#{value}) || '%'
-			</when>
-			<when test="condition == 'writer'">
-				where upper(user_id) like '%'|| upper(#{value}) ||'%'
-			</when>
-			<when test="condition == 'reportType'">
-				where upper(report_type) = upper(#{value}) 
-			</when>
-			<when test="condition == 'reportStatus'">
-				where upper(report_status) = #{value}
-			</when>
-			<otherwise>
-            	where (upper(r.report_title) like '%' || upper(#{value}) || '%')
-            </otherwise>
-	  </choose>
-	</if>
+    from (
+    	select report_target_no
+    	from report r
+    	where report_type ='U'
+		GROUP BY report_target_no
+		) t
+   
+</select>
+<select id="getReportListCount2" resultType="int">
+select count(*) 
+    from (
+    	select report_target_no
+    	from report r
+    	where report_type ='B'
+	GROUP BY report_target_no
+		) t
+   
 </select>
 
-<select id="selectReportList" resultType="itView.springboot.dto.ReportDetail">
-    SELECT r.report_no,
-           r.report_title,
-           r.report_date,
-           r.report_modify_date,
-           r.report_status,
-           r.report_type,
-           r.reporter_user_id,
-           r.report_target_no,
-           u.user_id AS writer
-    FROM report r
-    LEFT JOIN "USER" u 
-    	 ON  r.reporter_user_id = u.user_no
-        <if test="value != null and value != ''">
-            <choose>
-                <when test="condition == 'reportTitle'">
-                    where UPPER(r.report_title) LIKE '%' || UPPER(#{value}) || '%'
-                </when>
-                <when test="condition == 'writer'">
-                    where UPPER(u.user_id) LIKE '%' || UPPER(#{value}) || '%'
-                </when>
-                <when test="condition == 'reportType'">
-                    where UPPER(r.report_type) = UPPER(#{value})
-                </when>
-                <when test="condition == 'reportStatus'">
-                    where UPPER(r.report_status) = UPPER(#{value})
-                </when>
-                <otherwise>
-            		where upper(r.report_title like '%' || #{value} || '%')
-            	</otherwise>
-            </choose>
-        </if>
-    ORDER BY r.report_date DESC
+<select id="getReportListCount3" resultType="int">
+select count(*) 
+    from (
+    	select report_target_no
+    	from report r
+    	where report_type = 'R'
+	GROUP BY report_target_no
+	) t
+</select>
+
+<select id="getReportListCount4" resultType="int">
+select count(*) 
+    from (
+    	select report_target_no
+    	from report r
+    	where report_type = 'V'
+    	 GROUP BY report_target_no
+		) t
+</select>
+
+<select id="selectReportUserList">
+	 SELECT 
+        ROW_NUMBER() OVER (ORDER BY COUNT(r.report_no) DESC) AS row_num,
+        r.report_type,
+        r.report_status,
+        r.report_date,
+        r.report_title,
+        u.user_type,
+        u.user_status,
+        u.user_no,
+        u.user_name,
+        COUNT(r.report_no) AS report_count
+    FROM "USER" u
+    JOIN report r
+      ON r.report_target_no = u.user_no
+    WHERE r.report_type = 'U'
+    GROUP BY u.user_no, u.user_name,r.report_date,r.report_status, r.report_type, u.user_type, u.user_status,r.report_title
+    ORDER BY report_count DESC
+</select>
+<select id="selectReportBoardList" >
+	SELECT 
+	    ROW_NUMBER() OVER (ORDER BY COUNT(report_no) DESC) AS row_num,
+	    r.report_type,
+	    r.report_date,
+	    r.report_title,
+	    r.report_status,
+	    b.board_id,
+	    b.board_title,
+	    u.user_name,
+	    COUNT(r.report_no) AS report_count
+		FROM board b
+		JOIN report r 
+		  ON r.report_target_no = b.board_id
+		JOIN "USER" u
+		  ON b.user_no = u.user_no
+		WHERE report_type = 'B'
+		GROUP BY  
+			b.board_id, b.board_title, 
+			r.report_type, r.report_date,
+			r.report_title,r.report_status,
+			u.user_name
+		ORDER BY report_count DESC
+</select>
+	
+<select id="selectReportReviewList" >
+	SELECT 
+	    ROW_NUMBER() OVER (ORDER BY COUNT(report_no) DESC) AS row_num,
+	    r.report_title,
+	    r.report_date,
+	    r.report_status,
+	    u.user_name,
+	    COUNT(r.report_no) AS report_count
+		FROM review e
+		JOIN report r
+		  ON r.report_target_no = e.review_no
+		JOIN "USER" u
+		  ON u.user_no = r.reporter_user_id 
+		WHERE report_type = 'R'
+		GROUP BY r.report_title, r.report_date,
+				r.report_status, u.user_name
+		ORDER BY report_count DESC
+</select>
+
+<select id="selectReportReplyList">
+	SELECT 
+	    ROW_NUMBER() OVER (ORDER BY COUNT(report_no) DESC) AS row_num,
+	    r.report_title,
+	    r.report_date,
+	    r.report_status,
+	    u.user_id,
+	    COUNT(report_no) AS report_count
+		FROM reply v
+		JOIN report r
+		  ON r.report_target_no = v.reply_no
+		JOIN "USER" u
+		  ON u.user_no = r.reporter_user_id 
+		WHERE report_type = 'V'
+		GROUP BY 
+			 r.report_title,
+			 r.report_date,
+			 r.report_status,
+	         u.user_id
+		ORDER BY report_count DESC
 </select>
 
 
-<select id="selectReportDetail" parameterType="int" resultType="itView.springboot.dto.ReportDetail">
-	select * from report where report_no = #{reportNo}
+<!-- 신고 상세조회 + 히스토리 -->
+<select id="selectReportUser">
+	select 
+		u.user_name,
+		u.user_type,
+		u.user_no,
+		u.user_status,
+		count(r.report_no) as report_count,
+		max(r.report_date) as report_date
+	from "USER" u 
+	join report r on (reporter_user_id = user_no)
+	where user_no = #{userNo}
+	group by u.user_name, u.user_type, u.user_no,u.user_status
 </select>
+<select id="getReportCount">
+	select count(*) from report 
+	where report_type = 'U' and report_target_no = #{userNo}
+</select>
+<select id="getUserReportList">
+	select * 
+	from report
+	join "USER" on (user_no = reporter_user_id)
+	where report_target_no = #{userNo}
+	order by report_date desc
+</select>
+
+
+<select id="selectReportBoard" parameterType="int" resultType="Board">
+	SELECT 
+	    r.report_status,
+	    r.report_title,
+	    r.report_no,
+	    b.board_id,
+	    b.board_title,
+	    b.board_content,
+	    u.user_id,
+	    COUNT(r.report_no) AS report_count
+	    max(r.report_date) as report_date
+		FROM board b
+		JOIN report r 
+		  ON r.report_target_no = b.board_id
+		JOIN "USER" u
+		  ON b.user_no = u.user_no
+		WHERE report_type = 'B' and r.report_no = #{reportNo}
+		 group by b.board_id, b.board_title, b.board_content
+</select>
+<select id="getBoardReportCount">
+	select count(*) from report 
+	where report_type = 'B' and report_target_no = #{boardId}
+</select>
+<select id="getBoardReportList">
+	select * 
+	from report
+	join board on (user_no = reporter_user_id)
+	where report_target_no = #{boardId}
+	order by report_date desc
+</select>
+
+
+<select id="selectReportReview" parameterType="int" resultType="Review">
+SELECT 
+	    r.report_no, 
+	    r.report_status,
+	    r.report_title,
+	    u.user_name,
+	    e.review_date,
+	    e.review_no,
+	    e.review_content,
+	    COUNT(r.report_no) AS report_count,
+	    max(r.report_date) as report_date
+		FROM review e
+		JOIN report r 
+		  ON r.report_target_no = e.review_no
+		JOIN "USER" u 
+		  ON e.user_no = u.user_no
+		WHERE report_type = 'R' and r.report_no = #{reportNo}
+		GROUP BY 
+			r.report_no,
+		    r.report_status,
+		    r.report_title,
+		    u.user_name,
+		    e.review_date,
+		    e.review_no,
+		    e.review_content
+</select>
+
+<select id="getReviewReportCount">
+select count(*) from report 
+where report_type = 'R' and report_target_no = #{reviewNo}
+
+</select>
+<select id="getReviewReportList">
+select * 
+	from report
+	join review on (user_no = reporter_user_id)
+	where report_target_no = #{reviewNo}
+	order by report_date desc
+</select>
+
+
+<select id="selectReportReply" parameterType="Integer" resultType="Reply">
+SELECT 
+	    r.report_no, 
+	    r.report_title,
+	    v.reply_no,
+	    v.reply_date,
+	    v.reply_status,
+	    v.reply_content,
+	    u.user_Id,
+	    u.user_name,
+	    COUNT(r.report_no) AS report_count,
+	    max(r.report_date) as report_date
+		FROM reply v
+		JOIN report r 
+		  ON r.report_target_no = v.reply_no
+		JOIN "USER" u
+		  ON v.user_no = u.user_no
+		WHERE report_type = 'R' and r.report_no = #{reportNo}
+		GROUP BY
+		    r.report_no, 
+		    r.report_title,
+		    v.reply_no,
+		    v.reply_date,
+		    v.reply_status,
+		    v.reply_content,
+		    u.user_Id,
+		    u.user_name
+</select>
+<select id="getReplyReportCount">
+select count(*) from report 
+where report_type = 'V' and report_target_no = #{replyNo}
+</select>
+<select id="getReplyReportList">
+select * 
+	from report r
+	join "USER" u on (u.user_no = r.reporter_user_id)
+	where report_target_no = #{replyNo}
+	order by report_date desc
+</select>
+
+
+
+
+
+
+
+
+
 
 
 <!-- 일반 문의 게시판 조회 -->
@@ -158,7 +387,48 @@ select count(*)
 	where board_type='3' and board_status ='Y'
 </select>
 
+<select id="gBoardDetail" parameterType="int" resultType="itView.springboot.dto.GboardDetail">
+select 
+		b.board_id,
+		b.board_title,
+		b.board_content,
+		b.board_date,
+		b.board_modified_date,
+		b.board_type,
+		b.board_status,
+		b.user_no,
+		b.board_reply_status,
+		u.user_id
+from board b
+join "USER" u 
+ 	  on b.user_no = u.user_no
+where board_id = #{boardId} and board_status='Y' and board_type='3'
+order by board_date desc, board_id DESC
+</select>
 
+<!-- 일반문의게시판 답변등록 -->
+<insert id="saveGreply">
+	insert into admin_reply
+	values (ㅡ
+		seq_admin_reply.nextval,
+		#{replyContent},
+		sysdate,
+		sysdate,
+		'Y',
+		#{boardId},
+		'3',
+		#{userNo}
+		)
+</insert>
+
+<!-- 일반문의 댓글조회-->
+<select id="getGeneralReplyList" parameterType="int" resultType="AdminReply">
+	select * from admin_reply 
+	where board_type='3' 
+		and reply_status ='Y' 
+		and board_id = #{boardId}
+	order by reply_date desc
+</select>
 
 
 <!-- 판매자 문의게시판 조회하기 -->
@@ -210,40 +480,29 @@ SELECT COUNT(*)
     </where>
 </select>
 
-<select id="selecProhibitList" resultType="itView.springboot.dto.prohibitProduct">
-SELECT p.product_no,
-	   p.product_name,
-	   p.PRODUCT_CATEGORY,
-       p.PRODUCT_COMPANY,
-       p.PRODUCT_STATE,
-       b.BOARD_ID,
-       b.BOARD_TITLE,
-       b.BOARD_CONTENT,
-       b.BOARD_DATE,
-       b.BOARD_MODIFIED_DATE,
-       b.BOARD_TYPE,
-       b.BOARD_STATUS
+<select id="selecProhibitList" resultType="Board">
+SELECT *
     FROM BOARD b
-    JOIN PRODUCT p ON b.USER_NO = p.USER_NO
     <where>
-    	b.BOARD_STATUS = 'Y'AND BOARD_TYPE='8'
+    	BOARD_STATUS = 'Y'AND BOARD_TYPE='8'
         <if test="value != null and value != ''">
             <choose>
-                <when test="condition == 'productName'">
-                    AND UPPER(p.PRODUCT_NAME) LIKE '%' || UPPER(#{value}) || '%'
+                <when test="condition == 'boardTitle'">
+                    AND UPPER(board_title) LIKE '%' || UPPER(#{value}) || '%'
                 </when>
-                <when test="condition == 'productCompany'">
-                    AND UPPER(p.PRODUCT_COMPANY) LIKE '%' || UPPER(#{value}) || '%'
+                <when test="condition == 'boardNo'">
+                    AND board_id LIKE '%' || #{value} || '%'
                 </when>
                 <when test="condition == 'boardDate'">
-                    AND TO_CHAR(b.BOARD_DATE, 'YYYY-MM-DD') = #{value}
+                    AND TO_CHAR(BOARD_DATE, 'YYYYMMDD') = #{value}
                 </when>
                 <otherwise>
-                    AND (UPPER(p.PRODUCT_NAME) LIKE '%' || UPPER(#{value}) || '%')
+                    AND (UPPER(board_title) LIKE '%' || UPPER(#{value}) || '%')
                 </otherwise>
             </choose>
         </if>
     </where>
+     ORDER BY BOARD_DATE DESC  <!-- 최신순 -->
 </select>
 
 <!-- 판매금지 제품 공지사항 등록 -->
@@ -273,8 +532,14 @@ SELECT p.product_no,
 
 </insert>
 
+<select id="proBoardDetail" parameterType="int" resultType="Board">
+	select * from board where board_id = #{boardId} and board_type='8' and board_status = 'Y'
+</select>
 
 
+<update id="proBoardDelete">
+	update board set board_status ='N' where board_id=#{boardId} and board_type='8'
+</update>
 
 
 

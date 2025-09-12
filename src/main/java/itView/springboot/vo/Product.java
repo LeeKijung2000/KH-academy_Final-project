@@ -30,6 +30,8 @@ public class Product {
 	private String ingredient;
 	private String ecoFriendly;
 	
+	private int reviewCount;
+	
 	// join시 가져올 이름
 	private String brandName;
 
@@ -37,7 +39,13 @@ public class Product {
 	private String attmRename;
 	
 	// DB 저장 X, 화면에만 쓰는 값
-	private transient Double matchRate;  
+	private transient Double matchRate;
+	
+	// 썸네일 경로
+	private String firstImage; 
+	private String reportType;
+	private int reportCount;
+	private int rowNum;
 
 
 }

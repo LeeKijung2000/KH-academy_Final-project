@@ -6,7 +6,7 @@
         <title>쿠폰 공지사항 등록</title>
 
         <!-- CSS 파일 -->
-        <link href="/css/inhoCss/enrollCouponNotice.css" rel="stylesheet" />
+        <link href="/css/inhoCss/commonContent.css" rel="stylesheet" />
         <link href="/css/inhoCss/sidebar.css" rel="stylesheet" type="text/css" />
         <link href="/css/inhoCss/header.css" rel="stylesheet" type="text/css"/>
 
@@ -30,16 +30,10 @@
 
                 <!-- 메인 컨텐츠 -->
                 <main class="main-content">
-                    <h2>쿠폰 공지사항 등록</h2>
-                    <form action="/inhoAdmin/enrollCouponNotice" method="post" class="coupon-form" id="noticeForm">
-<!--                         <label for="coupon">쿠폰 선택</label> -->
-<!--                         <select id="coupon" name="couponId" required> -->
-<!--                             <option value="">쿠폰 선택</option> -->
-<!--                             <option value="1">여름 할인 쿠폰</option> -->
-<!--                             <option value="2">VIP 회원 전용 쿠폰</option> -->
-<!--                             <option value="3">신규 가입 쿠폰</option> -->
-<!--                         </select> -->
-
+                    <h2 class="page-title">쿠폰 공지사항 등록</h2>
+                    <form action="/inhoAdmin/enrollNotice" method="post" class="coupon-form" id="noticeForm">
+						<input type="hidden" name="boardType" value="4">
+						
                         <label for="boardTitle">공지 제목</label>
                         <input type="text" id="boardTitle" name="boardTitle" placeholder="공지 제목 입력" required />
 
@@ -49,17 +43,9 @@
 
 						<!-- 업로드된 이미지 파일명 저장용 -->
    						<input type="hidden" name="uploadedFiles" id="uploadedFiles">
-<!-- 						<label for="target">공지 대상</label> -->
-<!--                         <select id="target" name="target" required> -->
-<!--                             <option value="">대상 선택</option> -->
-<!--                             <option value="all">전체 회원</option> -->
-<!--                             <option value="vip">VIP 회원</option> -->
-<!--                             <option value="new">신규 회원</option> -->
-<!--                         </select> -->
 						
-                        <label>공지 노출기간</label>
-                        <input type="date" id="boardDate" name="boardDate" /> ~
-<!--                         <input type="date" id="endDate" name="endDate" /> -->
+                        <label>공지 작성일</label>
+                        <input type="date" id="boardDate" name="boardDate"  />
 
                         <div class="btn-group">
                             <button type="submit" class="btn-submit">등록</button>

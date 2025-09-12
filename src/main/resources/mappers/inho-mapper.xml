@@ -62,13 +62,13 @@
 		where user_id = #{userId}
 	</select>
 	
-	<insert id="enrollCouponNotice">
+	<insert id="enrollNotice">
 		<selectKey keyProperty="boardId" resultType="int" order="BEFORE">
 			select seq_board.nextval from dual
 		</selectKey>
 		insert into board
 		values(#{boardId}, #{boardTitle}, sysdate, #{boardModifiedDate}, 
-				'4', 'Y', #{userNo}, #{boardContent}, default)
+				#{boardType}, 'Y', #{userNo}, #{boardContent}, #{boardReplyStatus})
 	</insert>
 	
 	<!-- 첨부파일 등록 -->
@@ -108,7 +108,7 @@
 	<select id="selectTargetUser">
 		select *
 		from "USER"
-		where user_grade = #{couponTarget}
+		where user_grade = #{couponTarget} and user_type = 'U'
 	</select>
 
 	<insert id="insertCouponBox">
@@ -119,10 +119,14 @@
 	<select id="getCouponCount">
 		select count(*)
 		from coupon
+			join "USER" using(user_no)
 		<if test="value != null">
 			<choose>
-				<when test="condition == 'name'">
+				<when test="condition == 'title'">
 					where coupon_name like '%${value}%'
+				</when>
+				<when test="condition == 'name'">
+					where user_name like '%${value}%'
 				</when>
 			</choose>
 		</if>
@@ -134,8 +138,11 @@
 			join "USER" using(user_no)
 		<if test="value != null">
 			<choose>
-				<when test="condition == 'name'">
+				<when test="condition == 'title'">
 					where coupon_name like '%${value}%'
+				</when>
+				<when test="condition == 'name'">
+					where user_name like '%${value}%'
 				</when>
 			</choose>
 		</if>
@@ -145,10 +152,15 @@
 	<select id="getCouponBoardCount">
 		select count(*)
 		from board
+			join "USER" using(user_no)
+		where board_type = 4
 		<if test="value != null">
 			<choose>
 				<when test="condition == 'title'">
-					where board_title like '%${value}%'
+					and board_title like '%${value}%'
+				</when>
+				<when test="condition == 'name'">
+					and user_name like '%${value}%'
 				</when>
 			</choose>
 		</if>
@@ -158,10 +170,14 @@
 		select *
 		from board
 			join "USER" using(user_no)
+		where board_type = 4
 		<if test="value != null">
 			<choose>
 				<when test="condition == 'title'">
-					where board_title like '%${value}%'
+					and board_title like '%${value}%'
+				</when>
+				<when test="condition == 'name'">
+					and user_name like '%${value}%'
 				</when>
 			</choose>
 		</if>
@@ -190,7 +206,7 @@
 
 	<update id="updateCouponBoard">
 		update board
-		set board_title = #{boardTitle}, board_content = #{boardContent}, board_type = '4', board_modified_date = sysdate
+		set board_title = #{boardTitle}, board_content = #{boardContent}, board_type = 4, board_modified_date = sysdate
 		where board_id = #{boardId}
 	</update>
 	
@@ -203,15 +219,20 @@
 		update point
 		set point_name = #{pointName}, point_description = #{pointDescription}, point_value = #{pointValue},
 			point_enddate = #{pointEnddate}
+		where point_no = #{pointNo}
 	</update>
 	
 	<select id="getPointCount">
 		select count(*)
 		from point
+			join "USER" using(user_no)
 		<if test="value != null">
 			<choose>
 				<when test="condition == 'name'">
 					where point_name like '%${value}%'
+				</when>
+				<when test="condition == 'name'">
+					where user_name like '%${value}%'
 				</when>
 			</choose>
 		</if>
@@ -223,8 +244,11 @@
 			join "USER" using(user_no)
 		<if test="value != null">
 			<choose>
-				<when test="condition == 'name'">
+				<when test="condition == 'title'">
 					where point_name like '%${value}%'
+				</when>
+				<when test="condition == 'name'">
+					where user_name like '%${value}%'
 				</when>
 			</choose>
 		</if>
@@ -273,5 +297,172 @@
 		order by product_no desc
 	</select>
 	
+	<select id="selectPoint">
+		select *
+		from point
+		where point_no = #{pointNo}
+	</select>
+	
+	<delete id="deleteNotice">
+		delete from board
+		where board_id = #{boardId}
+	</delete>
+	
+	<delete id="deleteCoupon">
+		delete from coupon
+		where coupon_no = #{couponNo}
+	</delete>
+	
+	<delete id="deletePoint">
+		delete from point
+		where point_no = #{pointNo}
+	</delete>
+	
+	<select id="getNoticeCount">
+		select count(*)
+		from board
+			join "USER" using(user_no)
+		where board_type in (1,2,4,5,8)
+		<if test="value != null">
+			<choose>
+				<when test="condition == 'title'">
+					and board_title like '%${value}%'
+				</when>
+				<when test="condition == 'name'">
+					and user_name like '%${value}%'
+				</when>
+			</choose>
+		</if>
+	</select>
+	
+	<select id="selectNoticeList">
+		select *
+		from board
+			join "USER" using(user_no)
+		where board_type in (1,2,4,5,8)
+		<if test="value != null">
+			<choose>
+				<when test="condition == 'title'">
+					and board_title like '%${value}%'
+				</when>
+				<when test="condition == 'name'">
+					and user_name like '%${value}%'
+				</when>
+			</choose>
+		</if>
+		order by board_id desc
+	</select>
+	
+	<update id="updateNotice">
+		update board
+		set board_title = #{boardTitle}, board_content = #{boardContent}, board_type = #{boardType}, board_modified_date = sysdate
+		where board_id = #{boardId}
+	</update>
+	
+	<select id="selectNotice">
+		select *
+		from board
+		where board_id = #{boardId}
+	</select>
+	
+	<select id="selectThumbnail">
+		select attm_rename
+		from attachment
+		where attm_position = 0 and position_no = #{productNo} 
+				and attm_level = 0 and attm_status = 'Y'
+	</select>
+	
+	<select id="selectProduct">
+		select *
+		from product
+		where product_no = #{productNo}
+	</select>
+	
+	<select id="getReportProductCount" resultType="int">
+	    SELECT COUNT(*)
+		FROM (
+		    SELECT report_target_no
+		    FROM report
+		    WHERE report_type = 'P'
+		    GROUP BY report_target_no
+		) t
+	</select>
+
+	
+	<select id="selectReportProductList">
+		SELECT 
+		    ROW_NUMBER() OVER (ORDER BY COUNT(report_no) DESC) AS row_num,
+		    report_type,
+		    product_no,
+		    product_name,
+		    COUNT(report_no) AS report_count
+		FROM product
+		JOIN report
+		  ON report_target_no = product_no
+		WHERE report_type = 'P'
+		GROUP BY product_no, product_name, report_type
+		ORDER BY report_count DESC
+	</select>
+	
+	<select id="selectReportProduct">
+		select *
+		from product
+		where product_no = #{productNo}
+	</select>
+	
+<!-- 	<select id="selectReport"> -->
+<!-- 		select * -->
+<!-- 		from report -->
+<!-- 		where report_type = 'P' and report_target_no = #{productNo} -->
+<!-- 	</select> -->
+
+	<select id="getReportCount">
+		select count(*)
+		from report
+		where report_type = 'P' and report_target_no = #{productNo}
+	</select>
+	
+	<select id="selectReportList">
+		select *
+		from report
+			join "USER" on(user_no = reporter_user_id)
+		where report_target_no = #{productNo}
+		order by report_date desc
+ 	</select>
+ 	
+ 	<update id="updateReportModifyDate">
+ 		update report
+ 		set report_modify_date = #{modifyDate}
+ 		where report_target_no = #{productNo}
+ 	</update>
+ 	
+ 	<update id="updateProductState">
+ 		update product
+ 		set product_state = 'N'
+ 		where product_no = #{productNo}
+ 	</update>
+ 	
+ 	<update id="activateProducts">
+ 		<![CDATA[
+ 		update product
+ 		set product_state ='Y'
+ 		where product_state = 'N'
+ 			and exists (
+ 				select 1 from report
+ 				where report_target_no = product_no
+ 					and report_modify_date <= #{today}
+ 			)
+ 		]]>
+ 			
+ 	</update>
+ 	
+ 	<insert id="enrollReport">
+ 		<selectKey keyProperty="reportNo" resultType="int" order="BEFORE">
+			select seq_report.nextval from dual
+		</selectKey>
+		insert into report
+		values(#{reportNo}, #{reportTitle}, #{reportContent}, default, default,
+				default, #{reportType}, #{reporterUserId}, #{reportTargetNo})
+ 	</insert>
 	
 </mapper>

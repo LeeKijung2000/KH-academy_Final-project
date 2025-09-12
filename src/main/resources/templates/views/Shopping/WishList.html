@@ -17,7 +17,7 @@ body {
 }
 
 .all{
-margin-right: 5%;
+margin-right: 3%;
 	margin-left: 7%;
 	margin-bottom:3%;
 	margin-top:2%;
@@ -83,7 +83,6 @@ hr {
 
 .product-image {
 	position: relative;
-	background-color: #aaa;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -106,6 +105,7 @@ hr {
 	color: black;
 	font-weight: bold;
 }
+
 .product-info p {
 	margin: 2px 0;
 	text-align: left;
@@ -124,6 +124,10 @@ hr {
 .name {
 	color: gray;
 	font-size: 18px;
+	display: -webkit-box;        
+  	-webkit-line-clamp: 1;       
+  	-webkit-box-orient: vertical;
+  	overflow: hidden;  
 }
 
 #cart-insert {
@@ -147,16 +151,42 @@ hr {
 	background: #8ad8f0;
 	color: white;
 }
+
+.soldout {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5);   
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;               
+}
+.unavailable {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5);   
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;               
+}
+
 </style>
 </head>
 <body>
 <!-- 전역 헤더 (공통) -->
-  <header class="site-header"><a href="index">It:View</a></header>
+  <header class="site-header">It:View</header>
 
   <!-- 전역 사이드바 (공통) : 아이콘 구조로 교체 -->
   <nav class="sidenav" aria-label="Primary">
     <div class="sidenav-top">
-      <a class="nav-item active" href="/my/myInfo"><i class="fa-solid fa-user"></i><span>마이페이지</span></a>
+      <a class="nav-item active" href="/my/myPage"><i class="fa-solid fa-user"></i><span>마이페이지</span></a>
       <a class="nav-item" href="/experience/experienceApplication"><i class="fa-solid fa-gift"></i><span>체험단 신청</span></a>
       <a class="nav-item" href="/my/myReview"><i class="fa-solid fa-star"></i><span>리뷰</span></a>
       <a class="nav-item" href="/Shopping/cart"><i class="fa-solid fa-cart-shopping"></i><span>장바구니</span></a>
@@ -166,12 +196,11 @@ hr {
     </nav>
     <div class="all">
 	<div class="wish-Top">
-	<form action="wishSort" method="get">
+	<form id="wishsortform" action="wishSort" method="get">
 		<select id="sort" name="wishSortType">
-			<option value="newest" selected>최신순</option>
-			<option value="oldest">담은순</option>
-			<option value="popular">인기순</option>
-			<option value="review">리뷰많은순</option>
+			<option value="newest" th:selected="${ws == 'newest'}">최신순</option>
+			<option value="oldest" th:selected="${ws == 'oldest'}">담은순</option>
+			<option value="review" th:selected="${ws == 'review'}">리뷰많은순</option>
 		</select>
 	</form>
 		<button type="button" id="checkdelete">선택삭제</button>
@@ -179,68 +208,32 @@ hr {
 	
 	<hr>
 
-	<span class="quantity">상품(<span class="total-product">[[${#lists.size(wlist)}]]</span>개)</span>
+	<span class="quantity">상품 (<span class="total-product">[[${#lists.size(wlist)}]]</span>개)</span>
+	<div th:if="${#lists.isEmpty(wlist)}" class="cart-empty">
+   		<p>찜이 비어 있습니다.</p>
+	</div>
 	<div class="product-list">
-		<div class="product-item" th:each="w:${wlist}">
-			<input type="checkbox" class="check" th:value="${w.wishlistNo}" th:data-productno="${w.productNo}"/>
+		<div class="product-item" th:if="${!#lists.isEmpty(wlist)}" th:each="w:${wlist}">
+			<input type="checkbox" class="check" th:value="${w.wishlistNo}" th:data-productno="${w.productNo}" th:disabled="${w.productStock == 0 or w.productState == 'N'}"/>
 			<div class="product-image">
-				<img th:each="a:${alist}" th:if="${a.positionNo==w.productNo}"
-						th:src="@{/uploadFilesFinal/{file}(file=${a.attmRename})}"
-						width="100%" height="100%" style="border-radius: 8px;" />
+				<a th:href="@{/Shopping/detail(productNo=${w.productNo})}">
+						<img th:each="a:${alist}" th:if="${a.positionNo==w.productNo}"
+						th:src="@{/} + ${a.attmRename}"
+						width="102%" height="102%" style="border-radius: 8px;" />
+				</a>
+						
+				<div th:if="${w.productStock == 0 && w.productState =='Y'}" class="soldout">
+    				품절
+  				</div>
+  				<div th:if="${w.productState == 'N'}" class="unavailable">
+    				판매중지
+  				</div>
 				<button class="delete-btn" type="button" th:data-wishno="${w.wishlistNo}">X</button>
 			</div>
 			<div class="product-info">
 				<p class="price" th:text="${#numbers.formatInteger(w.productPrice,3,'COMMA')}+'원'"></p>
 				<p class="brand">[[${w.productCompany}]]</p>
 				<p class="name">[[${w.productName}]]</p>
-			</div>
-		</div>
-		<div class="product-item">
-			<input type="checkbox" class="check">
-			<div class="product-image">
-				이미지1
-				<button class="delete-btn" type="button">X</button>
-			</div>
-			<div class="product-info">
-				<p class="price">가격</p>
-				<p class="brand">브랜드</p>
-				<p class="name">상품이름</p>
-			</div>
-		</div>
-		<div class="product-item">
-			<input type="checkbox" class="check">
-			<div class="product-image">
-				이미지1
-				<button class="delete-btn" type="button">X</button>
-			</div>
-			<div class="product-info">
-				<p class="price">가격</p>
-				<p class="brand">브랜드</p>
-				<p class="name">상품이름</p>
-			</div>
-		</div>
-		<div class="product-item">
-			<input type="checkbox" class="check">
-			<div class="product-image">
-				이미지1
-				<button class="delete-btn" type="button">X</button>
-			</div>
-			<div class="product-info">
-				<p class="price">가격</p>
-				<p class="brand">브랜드</p>
-				<p class="name">상품이름</p>
-			</div>
-		</div>
-		<div class="product-item">
-			<input type="checkbox" class="check">
-			<div class="product-image">
-				이미지1
-				<button class="delete-btn" type="button">X</button>
-			</div>
-			<div class="product-info">
-				<p class="price">가격</p>
-				<p class="brand">브랜드</p>
-				<p class="name">상품이름</p>
 			</div>
 		</div>
 	</div>
@@ -256,8 +249,8 @@ hr {
 		const checkdelete = document.getElementById('checkdelete');
 		const deleteBtn = document.querySelectorAll('.delete-btn');
 		const cartInsert=document.getElementById('cart-insert');
-		
-		
+		const sort=document.querySelector('#sort');
+		const wishsortform=document.getElementById('wishsortform');
 		
 		if(checkdelete != null){
 			checkdelete.addEventListener('click',()=>{
@@ -273,8 +266,9 @@ hr {
 					alert('삭제할 상품을 선택하세요.');
 					return;
 				}
+				if(confirm('선택한 상품을 삭제하시겠습니까?')){
 				$.ajax({
-					url:'/Shopping/wishcheckDeletewish',
+					url:'/Shopping/wishcheckDelete',
 					type:'post',
 					traditional:true,
 					data:{wishlistNo:checkedItems},
@@ -288,6 +282,7 @@ hr {
 					},
 					error:data => console.log(data)
 				});
+				}
 			});
 			
 		}	
@@ -349,6 +344,15 @@ hr {
 				error:data => console.log(data)
 			});
 		});
+		
+		
+		if(sort){
+			sort.addEventListener('change',()=>{
+				wishsortform.submit();
+				
+				
+			});
+		}
 		
 	}
 		
