@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>체험단 관리 페이지</title>
+<link href="/css/seller/experienceManagePage.css" rel="stylesheet"
+	type="text/css" />
+</head>
+<body>
+	<div th:replace="~{common/sellerHeader :: sellerHeader}"></div>
+	<div class="layout">
+		<div class="sidebar" th:replace="~{common/sellerSidebar :: sellerSidebar}"></div>
+
+		<div class="content">
+			<h2>체험단 신청 관리</h2>
+			
+			<div class="application-list">
+			    <div class="application-card" th:each="ea : ${eaList}">
+			    	<input type="hidden" class="applyNo" th:value="${ea.applyNo}"/>
+			        <div class="application-info">
+			            <p><strong>회원 이름 : </strong>[[${ea.userName}]]</p>
+			            <p><strong>모집글 제목 : </strong>[[${ea.expTitle}]]</p>
+			            <p><strong>신청 내용 : </strong>[[${ea.applyContent}]]</p>
+			        </div>
+			        <div class="application-actions">
+			            <button class="approve-btn">수락</button>
+			            <button class="reject-btn">거절</button>
+			        </div>
+			    </div>
+			</div>
+		</div>
+	</div>
+	
+	<script>
+		window.onload = () => {
+			const approveBtns = document.querySelectorAll('.approve-btn');
+			for(approveBtn of approveBtns){
+				approveBtn.addEventListener('click', e => {
+					const applyNo = e.target.parentElement.parentElement.children[0].value;
+					if(confirm("이 회원의 체험단 신청을 수락하시겠습니까?")){
+						location.href = '/seller/expApply/' + applyNo;
+					}
+				});
+			}
+			
+			const rejectBtns = document.querySelectorAll('.reject-btn');
+			for(rejectBtn of rejectBtns){
+				rejectBtn.addEventListener('click', e => {
+					const applyNo = e.target.parentElement.parentElement.children[0].value;
+					if(confirm("이 회원의 체험단 신청을 거절하시겠습니까?")){
+						location.href = '/seller/expReject/' + applyNo;
+					}
+				});
+			}
+		}
+	</script>
+</body>
+</html>
