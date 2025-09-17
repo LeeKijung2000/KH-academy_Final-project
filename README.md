@@ -1,3 +1,6 @@
+<img width="954" height="539" alt="image" src="https://github.com/user-attachments/assets/94bf0f45-4ad2-4444-932f-79a4d907a662" />
+
+
 # 🧴 화해 모티브 화장품 사이트 (Final Project)
 
 ## 📌 프로젝트 개요
