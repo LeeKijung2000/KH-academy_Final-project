@@ -4,8 +4,10 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>신고 댓글 상세</title>
+        
+        <script th:src="@{/js/admin/admin_rReply_detail.js}" defer></script>
         <!-- CSS 파일 -->
-	    <link href="/css/inhoCss/reportProductDetail.css" rel="stylesheet" />
+	    <link href="/css/adminCss/admin_rReply_detail.css" rel="stylesheet" />
 	    <link href="/css/inhoCss/sidebar.css" rel="stylesheet" type="text/css" />
 	    <link href="/css/inhoCss/header.css" rel="stylesheet" type="text/css"/>
 	
@@ -25,8 +27,8 @@
                 <div class="main-content">
 	                <div class="main-section">
 	                    <h2 class="page-title">신고댓글 상세정보</h2>
-	                    <form id="detailForm" method="get" th:action="@{/inhoAdmin/updateReportProduct}">
-	                    	<input type="hidden" name="replyNo" th:value="${p.productNo}">
+	                    <form id="rp-detailForm" method="post">
+	                    	<input type="hidden" name="replyNo" th:value="${v.replyNo}">
 	                    	<input type="hidden" name="page" th:value="${page}">
 	                    	<table class="detail-table">
 	                        <tr>
@@ -56,14 +58,13 @@
 	                    </table>
 	                    <!-- 상품 정지기간 선택 영역 // 자자동해지 -->
 						<div class="stop-period-section" style="margin-bottom: 10px;">
-						    <label class="page-title">댓글 관리</label>
+						    <label class="page-title">리뷰 관리</label>
 						    <div style="margin-top: 10px;"></div>
 						</div>
 	                    
 	                    <div class="form-actions">
-	                        <button class="btn-submit">댓글 숨기기</button>
-	                        <button type="button" id="deleteBtn" class="btn-reset">댓글 삭제</button>
-	                        <button type="button" class="btn-reset" onclick="history.back()">취소</button>
+	                        <button type="button" id="rp-deleteBtn" class="rp-btn-reset">리뷰 삭제</button>
+	                        <button type="button" class="rp-btn-reset" onclick="history.back()">취소</button>
 	                    </div>
 	                    </form>
 	                </div>
@@ -76,22 +77,19 @@
 					        	<tr>
 					        		<th>신고번호</th>
 						            <th>신고제목</th>
-<!-- 						            <th>신고내용</th> -->
+   						            <th>신고내용</th>
 						            <th>신고 작성자</th>
 						            <th>신고일</th>
 					          	</tr>
 				          	</thead>
 				          	<tbody>
 					        	<tr th:each="r : ${vlist}">
-					            	<td>[[${r.reportNo}]]</td>
-					            	<td>[[${r.reportTitle}]]</td>
-<!-- 					            	<td>[[${r.reportContent}]]</td> -->
-					            	<td>[[${r.userName}]]</td>
-					            	<td>[[${r.reportDate}]]</td>
+					            	<td th:text="${r.reportNo}"></td>
+					            	<td th:text="${r.reportTitle}"></td>
+ 					            	<td th:text="${r.reportContent}"></td> 
+					            	<td th:text="${r.userName}"></td>
+					            	<td th:text="${r.reportDate}"></td>
 					        	</tr>
-<!-- 				          		<tr th:if="${#lists.isEmpty(reportHistoryList)}"> -->
-<!-- 				            		<td colspan="3" style="text-align:center;">신고 이력이 없습니다.</td> -->
-<!-- 				          		</tr> -->
 				        	</tbody>
 				    	</table>
 					</div>
@@ -99,21 +97,6 @@
             </div>
         </div>
 		<script th:src="@{/js/inhoAdmin/sidebar.js}"></script>
-		<script>
-			window.onload = () => {
-			    const delBtn = document.getElementById('deleteBtn');
-			    const form = document.getElementById('detailForm');
-	
-			    if (delBtn) {
-			        delBtn.addEventListener('click', () => {
-			            if (confirm("정말 상품을 삭제하시겠습니까?")) {
-			            	form.method = "post";
-			                form.action = '/inhoAdmin/deleteCoupon';
-			                form.submit();
-			            }
-			        });
-			    }
-			}
-		</script>
+		
     </body>
 </html>

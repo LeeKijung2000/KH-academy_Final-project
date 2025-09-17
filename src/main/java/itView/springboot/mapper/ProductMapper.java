@@ -7,14 +7,17 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import itView.springboot.vo.AdminReply;
 import itView.springboot.vo.Answer;
 import itView.springboot.vo.Attachment;
+import itView.springboot.vo.Board;
 import itView.springboot.vo.Coupon;
 import itView.springboot.vo.ExperienceApplication;
 import itView.springboot.vo.ExperienceGroup;
 import itView.springboot.vo.Order;
 import itView.springboot.vo.Product;
 import itView.springboot.vo.Question;
+import itView.springboot.vo.Reply;
 import itView.springboot.vo.Review;
 import itView.springboot.vo.ReviewAnswer;
 import itView.springboot.vo.User;
@@ -88,9 +91,9 @@ public interface ProductMapper {
 
 	int insertAnswer(Answer answer);
 
-	int selectBeforeAnswerCount();
+	int selectBeforeAnswerCount(int userNo);
 
-	int selectAfterAnswerCount();
+	int selectAfterAnswerCount(int userNo);
 
 	int deleteAnswer(int answerNo);
 
@@ -104,8 +107,6 @@ public interface ProductMapper {
 
 	ArrayList<Order> selectMyOrderList(int userNo);
 
-	ArrayList<ReviewAnswer> countReviewAnswer(int userNo);
-
 	ArrayList<ReviewAnswer> selectReviewAnswer(int productNo);
 
 	int deleteReviewAnswer(int reviewAnswerId);
@@ -115,6 +116,24 @@ public interface ProductMapper {
 	int rejectExpApply(int applyNo);
 
 	int downCoupon(HashMap<String, Integer> map);
+
+	int editReviewAnswer(ReviewAnswer reviewAnswer);
+
+	int deleteReview(Review review);
+
+	int insertQuestion(Board board);
+
+	ArrayList<Board> selectMyBoard(int userNo);
+
+	Board selectMyBoardDetail(int boardId);
+
+	ArrayList<AdminReply> selectBoardReply(int boardId);
+
+	int updateQuestion(Board board);
+
+	int deleteQuestion(Board board);
+
+	ArrayList<ExperienceGroup> selectMyExp(int userNo);
 
 
 }

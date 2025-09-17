@@ -1,7 +1,11 @@
 package itView.springboot.service;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.stereotype.Service;
@@ -62,8 +66,6 @@ public class AdminService {
 		public int saveGreply(AdminReply adminReply) {
 			return mapper.saveGreply(adminReply);
 		}
-		
-
 		//일반문의 - 댓글조회
 		public ArrayList<AdminReply> getGeneralReplyList(int boardId) {
 			return mapper.getGeneralReplyList(boardId);
@@ -75,11 +77,25 @@ public class AdminService {
 	public Integer pBoardListCount(int boardType) {
 		return mapper.pBoardListCount(boardType);
 	}
-	public ArrayList<Board> selectpBoardList(PageInfo pi) {
+	public ArrayList<GboardDetail> selectpBoardList(PageInfo pi) {
 		int offset = (pi.getCurrentPage()-1)*pi.getBoardLimit();
 		RowBounds rowBounds = new RowBounds(offset, pi.getBoardLimit());
 		return mapper.selectpBoardList(rowBounds);
 	}
+	//판매자 문의게시판 상세페이지
+	public GboardDetail pBoardDetail(int boardId) {
+		return mapper.pBoardDetail(boardId);
+	}
+	//판매자 문의게시판 답변등록
+	public int savePreply(AdminReply adminReply) {
+		return mapper.savePreply(adminReply);
+	}
+
+	//판매자문의 - 댓글조회
+	public ArrayList<AdminReply> getPartnerReplyList(int boardId) {
+		return mapper.getPartnerReplyList(boardId);
+	}
+
 
 	
 	//판매금지 게시판(검색,조회)
@@ -212,7 +228,7 @@ public class AdminService {
 
 	//신고 커뮤니티글 상세보기
 	public Board selectReportBoard(int boardId) {
-		Board b = mapper.selectReportBoardList(boardId);
+		Board b = mapper.selectReportBoard(boardId);
 		return b;
 	}
 
@@ -257,6 +273,47 @@ public class AdminService {
 		RowBounds rowBounds = new RowBounds(offset, pi.getBoardLimit());
 		return mapper.getReplyReportList(rowBounds, replyNo);
 	}
+
+	//회원삭제(update N)
+	public int deleteUserByNo(int userNo) {
+		return mapper.deleteUserByNo(userNo);
+	}
+
+	//회원 기간정지(update N)
+	public int updateReportUserEndDate(Map<String, Object> map) {
+		return mapper.updateReportUserEndDate(map);
+	}
+
+	public int stopUser(int userNo) {
+		return mapper.stopUser(userNo);
+	}
+
+	//신고글 삭제
+	public int deleteBoardByNo(int boardId) {
+		return mapper.deleteBoardByNo(boardId);
+	}
+
+	public int deleteReviewByNo(Integer reviewNo) {
+		return mapper.deleteReviewByNo(reviewNo);
+	}
+
+	public int deleteReplyByNo(int replyNo) {
+		return mapper.deleteReplyByNo(replyNo);
+	}
+
+	public void restoreUser(LocalDate today) {
+		mapper.restoreUser(today);
+	}
+
+	
+	
+	//회원조회 버튼 : 회원신고글 상세보기 페이지 이동
+	public boolean existsReportForUser(int userNo) {
+		return mapper.existsReportForUser(userNo);
+	}
+
+
+
 
 
 	

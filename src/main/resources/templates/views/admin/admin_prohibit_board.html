@@ -28,7 +28,7 @@
 		           <div class="admin-proBoard-searchBox">
 		               <form th:action="@{/admin/proBoard}" method="get">
 		                   <select name="condition" class="form-select">
-		                       <option value="boardTitle" th:selected="${condition == 'boardTitle'}">제품명</option>
+		                       <option value="productName" th:selected="${condition == 'productName'}">제품명</option>
 		                       <option value="boardId" th:selected="${condition == 'boardId'}">게시판 번호</option>
 		                       <option value="boardDate"th:selected="${condition == 'boardDate'}">공지 작성일</option>
 		                   </select>
@@ -65,34 +65,36 @@
 		                       	</a>
 		                       </td>
 		                       <td>관리자</td>
-		                       <td th:text="${#dates.format(pro.boardDate,'yyyy-MM-dd')}"></td>
+		                      <td th:text="${#temporals.format(pro.boardDate, 'yyyy-MM-dd')}"></td>
+
 		                   </tr>
 		               </tbody>
 		           </table>
 		           <ul class="admin-proBoard-pagination">
 		               <li class="admin-proBoard-page-item" th:classappend="${pi.currentPage == 1} ? 'disabled'">
-				           <a class="page-link"
-			                   th:if="${pi.currentPage > 1}"
-			                   th:href="@{${loc}(page=${pi.currentPage-1})}"
-			                   aria-label="Previous">
-	                       <span aria-hidden="true">&laquo;</span>
-	                	   </a>
+							<a class="page-link" 
+							   th:if="${pi.currentPage > 1}"
+							   th:href="@{/admin/searchUser(condition=${condition}, value=${value}, page=${pi.currentPage-1})}"
+							   aria-label="Previous">
+							   <span aria-hidden="true">&laquo;</span>
+							</a>
 	                	   <span class="page-link" th:unless="${pi.currentPage > 1}">&laquo;</span>    
 			           </li>
 		              
 		              
 		               <li class="admin-proBoard-page-item" th:each="p : ${#numbers.sequence(pi.startPage, pi.endPage)}"
 		               	   th:classappend="${p == pi.currentPage} ? 'active'">
-			               <a class="page-link" th:href="@{${loc}(page=${p})}">[[${p}]]</a>
+			               <a class="page-link" 
+   							th:href="@{/admin/proBoard(condition=${condition}, value=${value}, page=${p})}">[[${p}]]</a>
             		   </li>
 		               
 		               <li class="admin-proBoard-page-item" th:classappend="${pi.currentPage == pi.maxPage} ? 'disabled'">
-				           	<a class="page-link"
-			                   th:if="${pi.currentPage < pi.maxPage}"
-			                   th:href="@{${loc}(page=${pi.currentPage+1})}"
-			                   aria-label="Next">
-			                   <span aria-hidden="true">&raquo;</span>
-	                		</a> 
+				           	<a class="page-link" 
+						   th:if="${pi.currentPage < pi.maxPage}"
+						   th:href="@{/admin/proBoard(condition=${condition}, value=${value}, page=${pi.currentPage+1})}"
+						   aria-label="Next">
+						   <span aria-hidden="true">&raquo;</span>
+						</a> 
                 			<span class="page-link" th:unless="${pi.currentPage < pi.maxPage}">&raquo;</span>
             			</li>
 		           </ul>

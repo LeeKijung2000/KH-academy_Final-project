@@ -115,10 +115,11 @@ public class ajaxController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("공지사항 삭제에 실패하였습니다.");
 		}
 	}
-	 //관리자 일반게시판 문의댓글 달기
-		@PostMapping("gReply/{boardId}")
+
+		//관리자 판매자 문의댓글 달기
+		@PostMapping("pReply/{boardId}")
 		@ResponseBody
-		public ResponseEntity<AdminReply> addReply(
+		public ResponseEntity<AdminReply> addPartReply(
 				@PathVariable("boardId") int boardId,
 				@RequestBody AdminReply adminReply,
 				HttpSession session){
@@ -131,10 +132,10 @@ public class ajaxController {
 			//권한체크
 			if(loginUser != null && "A".equals(loginUser.getUserType())) {
 				adminReply.setUserNo(loginUser.getUserNo());
-				adminReply.setBoardType(3);
+				adminReply.setBoardType(7);
 				adminReply.setBoardId(boardId);
 				
-				int result = adService.saveGreply(adminReply);
+				int result = adService.savePreply(adminReply);
 				if(result > 0) {
 					return ResponseEntity.ok(adminReply);
 				} else {
@@ -147,17 +148,15 @@ public class ajaxController {
 			
 		}
 		
-		//일반게시판 문의댓글 리스트 뽑아오기
-		@GetMapping("gReplyList")
+		//판매자문의 게시판 문의댓글 리스트 뽑아오기
+		@GetMapping("pReplyList")
 		@ResponseBody
-		public ArrayList<AdminReply> getReplyList(
+		public ArrayList<AdminReply> getPartReplyList(
 				@RequestParam("boardId") int boardId){
-			ArrayList<AdminReply> replyList = adService.getGeneralReplyList(boardId);
+			ArrayList<AdminReply> replyList = adService.getPartnerReplyList(boardId);
 			return replyList;
 		}
-		
-		
-    
+				
     
     
     

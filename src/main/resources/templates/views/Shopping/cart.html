@@ -196,11 +196,21 @@ select[name="coupon-option"] {
 	text-decoration: none;
 	height: 40px;
 	width: 30%;
-	border: 1px solid #34e5eb;
+	border: 1px solid #aaa;
+	outline: none;
+  	box-shadow: 0 0 2px rgba(0,170,255,0.15);
 	border-radius: 6px;
 	overflow:hidden;
 }
+select[name="coupon-option"] option{
+	padding:8px;
+	font-size:14px;
+}
 
+select[name="coupon-option"] option{
+	overflow-y: auto;
+ 	max-height: 180px;
+}
 .coupon {
 	display: flex;
 	justify-content: space-between;
@@ -208,6 +218,8 @@ select[name="coupon-option"] {
 	margin: 5px 0;
 	font-size: 18px;
 }
+
+
 #sort option:disabled{
 	background-color:#e0e0e0;
 	color:white;
@@ -332,24 +344,10 @@ select[name="coupon-option"] {
 </style>
 </head>
 <body>
-	<!-- 전역 헤더 (공통) -->
-	<header class="site-header">It:View</header>
+	<div th:replace="~{common/myHeader}"></div>
 
-	<!-- 전역 사이드바 (공통) : 아이콘 구조로 교체 -->
-	<nav class="sidenav" aria-label="Primary">
-		<div class="sidenav-top">
-			<a class="nav-item active" href="/my/myPage"><i
-				class="fa-solid fa-user"></i><span>마이페이지</span></a> <a class="nav-item"
-				href="/experience/experienceApplication"><i
-				class="fa-solid fa-gift"></i><span>체험단 신청</span></a> <a class="nav-item"
-				href="/my/myReview"><i class="fa-solid fa-star"></i><span>리뷰</span></a>
-			<a class="nav-item" href="/Shopping/cart"><i
-				class="fa-solid fa-cart-shopping"></i><span>장바구니</span></a> <a
-				class="nav-item" href="/Shopping/WishList"><i
-				class="fa-solid fa-heart"></i><span>찜</span></a> <a class="nav-item"><i
-				class="fa-solid fa-right-from-bracket"></i><span>로그아웃</span></a>
-		</div>
-	</nav>
+  <!-- 전역 사이드바 (공통) -->
+  <div th:replace="~{common/mySidebar}"></div>
 	<div class="all">
 		<div class="check">
 			<label><input type="checkbox" id="checkAll">전체선택</label>
@@ -374,7 +372,7 @@ select[name="coupon-option"] {
 				<label><input type="checkbox" class="checkItem" th:data-price="${c.productPrice}"
 					th:value="${c.cartNo}" th:data-company="${gc.key}" th:disabled="${c.productStock == 0 or c.productState == 'N'}"></label>
 				<div class="item-image">
-					<a th:href="@{/Shopping/detail(productNo=${c.productNo})}">
+					<a th:href="@{/product/detail/} + ${c.productNo}">
 						<img th:each="a:${alist}" th:if="${a.positionNo==c.productNo}"
 						th:src="@{/} + ${a.attmRename}"
 						width="100%" height="100%" style="border-radius: 8px;" />
@@ -391,7 +389,7 @@ select[name="coupon-option"] {
 					<div class="item-price" th:data-price="${c.productPrice}"
 						th:text="${#numbers.formatInteger(c.productPrice * c.amount,3,'COMMA')}+'원'">가격</div>
 					<div class="item-name">
-						<a th:href="@{/Shopping/detail(productNo=${c.productNo})}">
+						<a th:href="@{/product/detail/} + ${c.productNo}">
 							<span th:text="${c.productName}">이름</span>
 						</a>
 					</div>
@@ -431,7 +429,7 @@ select[name="coupon-option"] {
 				</select>
 			</div>
 			<div class="total">
-				<p class="total-coupon">총 주문금액</p>
+				<p class="total-coupon">예상 주문금액</p>
 				<p class="total-discount-price" style="color: black;">0원</p>
 			</div>
 			<div class="point">
@@ -439,7 +437,7 @@ select[name="coupon-option"] {
 				<p class="point-amount" style="color: black;">0원</p>
 			</div>
 		</div>
-		<button type="submit" id="product-order">상품 주문하기</button>
+		<button type="button" id="product-order">상품 주문하기</button>
 	</div>
 </body>
 <script>
@@ -463,7 +461,7 @@ select[name="coupon-option"] {
 		
 		const couponDiscount=document.getElementById('sort');
 		const pointreward=document.querySelector('.point-amount');
-		const productOrder=document.querySelector('.product-order');
+		const productOrder=document.getElementById('product-order');
 		
 		
 		
@@ -596,6 +594,24 @@ select[name="coupon-option"] {
 			const point=Math.floor(finalPrice*0.01);
 			pointreward.textContent=point.toLocaleString()+"원";
 		};
+		
+		const updateCartamount=(cartNo,qty)=>{
+				$.ajax({
+					url:'/Shopping/updateCartamount',
+					type:'post',
+					traditional:true,
+					data:{cartNo:cartNo, amount:qty},
+					success: data =>{
+						if(data<=0){
+							alert('수량변경실패');
+						}
+					},
+					error:data => console.log(data)
+				});
+				
+			
+		}
+		
 		
 		
 	    checkCompany.forEach(chkbrd => {
@@ -762,13 +778,17 @@ select[name="coupon-option"] {
 		            const productBox = cartBodies[i];
 		            const productQty = productBox.querySelector('.qty');
 		            const productPriceBox = productBox.querySelector('.item-price');
-
+		            const cartNo = productBox.querySelector('.delete-btn').dataset.cartno;
+		            
+		            
 		            let qty = parseInt(productQty.textContent);
 		            const stock = parseInt(productQty.dataset.stock);
 
 		            if(qty > 1){
 		                qty--;
 		                productQty.textContent = qty;
+		                
+		                updateCartamount(cartNo, qty);
 		            }
 
 		            btn.disabled = (qty === 1);
@@ -782,6 +802,7 @@ select[name="coupon-option"] {
 		            
 		    		couponActivation();
 		    		applyCoupon();
+		    		
 		        });
 		    });
 		
@@ -791,6 +812,10 @@ select[name="coupon-option"] {
 		            const productQty = productBox.querySelector('.qty');
 		            const productPriceBox = productBox.querySelector('.item-price');
 
+		            const cartNo = productBox.querySelector('.delete-btn').dataset.cartno;
+		            
+		            
+		            
 		            let qty = parseInt(productQty.textContent);
 		            const stock = parseInt(productQty.dataset.stock);
 
@@ -804,9 +829,13 @@ select[name="coupon-option"] {
 		                    minusBtn[i].disabled = false;
 		                }
 
+		                updateCartamount(cartNo, qty);
+		                
 		                const unit = parseInt(productPriceBox.dataset.price); 
 		                const total = unit * qty;
 		                productPriceBox.textContent = total.toLocaleString()+'원';
+		                
+		                
 		            } else {
 		                alert('상품이 더 이상 존재하지 않습니다. 😅');
 		            }
@@ -820,6 +849,7 @@ select[name="coupon-option"] {
 		            
 		    		couponActivation();
 		    		applyCoupon();
+		    		
 		        });
 		    });
 		 
@@ -846,22 +876,21 @@ select[name="coupon-option"] {
 					return;
 				}
 				if(confirm('선택한 상품을 주문하시겠습니까?')){
-				$.ajax({
-					url:'/Shopping/cartToOrder',
-					type:'post',
-					traditional:true,
-					data:{cartNo:checkedItems},
-					success: data =>{
-						if(data > 0){
-							location.reload();
-						}else{
-							alert('상품 주문 중 오류가 발생했습니다.');
-						}
-					},
-					error:data => console.log(data)
-				});
+					
+					let totalProductValue=totalProduct.textContent.replace(/[^0-9]/g,"");
+					
+					let selectedCoupon = couponDiscount.value;
+					
+					if(selectedCoupon == 'notice' || selectedCoupon=='none'){
+						selectedCoupon='';
+					}
+					
+					
+					location.href="/Shopping/payMent?cartNo="+checkedItems.join(",")
+									+"&coupon="+selectedCoupon;
+									
 				}
-			});
+			}); 
 			
 		
 		

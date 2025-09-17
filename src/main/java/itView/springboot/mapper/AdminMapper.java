@@ -1,6 +1,10 @@
 package itView.springboot.mapper;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -96,9 +100,16 @@ public interface AdminMapper {
 	//판매자 문의게시판 조회
 	Integer pBoardListCount
 		(@Param("boardType") int boardType);
-
-	ArrayList<Board> selectpBoardList(
+	ArrayList<GboardDetail> selectpBoardList(
 		@Param("rowBounds") RowBounds rowBounds);
+	GboardDetail pBoardDetail(int boardId);
+	
+	//판매자 문의게시판 답변
+	ArrayList<AdminReply> getPartnerReplyList(int boardId);
+	int savePreply(AdminReply adminReply);
+
+	
+	
 
 	
 	//판매금지 게시판 조회
@@ -131,7 +142,7 @@ public interface AdminMapper {
 	ArrayList<Report> getUserReportList(RowBounds rowBounds,int userNo );
 	
 	//신고 커뮤니티글 상세조회
-	Board selectReportBoardList(int boardId);
+	Board selectReportBoard(int boardId);
 	int getBoardReportCount(int boardId);
 	ArrayList<Report> getBoardReportList(RowBounds rowBounds, int boardId);
 	
@@ -144,6 +155,30 @@ public interface AdminMapper {
 	Reply selectReportReply(Integer replyNo);
 	int getReplyReportCount(Integer replyNo);
 	ArrayList<Report> getReplyReportList(RowBounds rowBounds, Integer replyNo);
+
+	
+	
+	//회원삭제(그냥 update N)
+	int deleteUserByNo(int userNo);
+	//회원정지(기간있는거)
+	int updateReportUserEndDate(Map<String, Object> map);
+	int stopUser(int userNo);
+
+	//게시글 삭제
+	int deleteBoardByNo(int boardId);
+
+	int deleteReviewByNo(Integer reviewNo);
+
+	int deleteReplyByNo(int replyNo);
+	//회원복구(자동)
+	void restoreUser(LocalDate today);
+
+	//회원조회상세 => 신고글 보기
+	boolean existsReportForUser(int userNo);
+
+
+	
+	
 
 	
 	

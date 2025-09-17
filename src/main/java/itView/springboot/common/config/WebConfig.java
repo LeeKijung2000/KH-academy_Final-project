@@ -5,7 +5,9 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import itView.springboot.common.config.interceptor.CheckAdminInterceptor;
 import itView.springboot.common.config.interceptor.FlashMessageInterceptor;
+import itView.springboot.common.config.interceptor.LogInterceptor;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
@@ -15,10 +17,20 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/**")
                 .addResourceLocations(
                 		"file:///C:/uploadFilesFinal/product/"
-                		, "classpath:/static/"
-                		, "file:///C:/uploadFilesFinal/notice/"
-                		, "file:///C:/uploadFilesFinal/community/"
-                		, "file:///C:/uploadFilesFinal/temp/");
+                		, "classpath:/static/");
+
+        // temp 폴더 (수정 금지)
+        registry.addResourceHandler("/uploadFilesFinal/temp/**")
+                .addResourceLocations("file:///c:/uploadFilesFinal/temp/");
+
+        // notice 폴더 (수정 금지)
+        registry.addResourceHandler("/uploadFilesFinal/notice/**")
+                .addResourceLocations("file:///c:/uploadFilesFinal/notice/");
+
+        // community 폴더 (수정 금지)
+        registry.addResourceHandler("/uploadFilesFinal/community/**")
+                .addResourceLocations("file:///c:/uploadFilesFinal/community/");
+
     }
     
     @Override
@@ -28,8 +40,13 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(new FlashMessageInterceptor())
                 .addPathPatterns("/**"); // 전체 경로 적용
 
-//        // 관리자 접근 체크
-//        registry.addInterceptor(new CheckAdminInterceptor())
-//                .addPathPatterns("/inhoAdmin/**"); // admin 페이지에만 적용
+        // 관리자 접근 체크
+        registry.addInterceptor(new CheckAdminInterceptor())
+                .addPathPatterns("/inhoAdmin/**", "/admin/**")
+                .excludePathPatterns("/inhoAdmin/ranking", "/inhoAdmin/enrollReport", "/inhoAdmin/enrollProductReport");// ranking page 제외
+        
+        // 로그 인터셉터
+        registry.addInterceptor(new LogInterceptor())
+		.addPathPatterns("/inhoAdmin/**");
     }
 }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>쇼핑몰 예제</title>
+    <title>커뮤니티 상세</title>
 
     <style>
         /* 본문 */
@@ -159,7 +159,6 @@
                     삭제
                 </button>
 
-                게시글 신고 버튼
                 <div th:if="${session.loginUser != null and session.loginUser.userNo != community.userNo}">
 				    <button
 				        type="button"
@@ -326,8 +325,7 @@
     </div>
   </div>
 <div th:replace="~{common/footer :: footer}"></div>
-<!-- <div th:replace="~{common/reportModal :: reportModal}"></div> -->
-<!-- <script th:src="@{/js/inhoAdmin/reportModal.js}"></script> -->
+<script th:src="@{/js/inhoAdmin/reportModal.js}"></script>
 <script th:src="@{/js/inhoAdmin/alert.js}"></script>
 <script th:inline="javascript">
 	const msg = /*[[${msg}]]*/ null;
@@ -384,22 +382,6 @@
             form.submit();
         }
     }
-    
-    
-    
-    
-    window.openReportModal = function(type, id) {
-    	  const modal = document.getElementById('reportModal');
-    	  if (!modal) return console.error('reportModal element not found');
-    	  document.getElementById('reportType').value = type;
-    	  document.getElementById('reportTargetNo').value = id;
-    	  document.getElementById('reportModal').style.display = 'flex';
-    	};
-
-    	window.closeReportModal = function() {
-    	  const modal = document.getElementById('reportModal');
-    	  if (modal) modal.style.display = 'none';
-    	};
 </script>
 
 </body>

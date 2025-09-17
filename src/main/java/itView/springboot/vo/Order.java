@@ -21,11 +21,14 @@ public class Order {
 	private String paymentMethod;
 	private int payPrice;
 	private String deliveryCompany;
-	private int deliveryNo;
+	private long deliveryNo;
 	private String deliveryStatus;
 	private int orderType;
 	private int userNo;
 	private int personalCouponNo;
+	
+	private LocalDate deliveryDate;
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	
 	private int productNo;
 	private String productName;

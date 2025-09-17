@@ -20,8 +20,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import itView.springboot.exception.ProductException;
 import itView.springboot.service.ProductService;
+import itView.springboot.service.ShoppingService;
+import itView.springboot.vo.AdminReply;
 import itView.springboot.vo.Answer;
 import itView.springboot.vo.Attachment;
+import itView.springboot.vo.Board;
 import itView.springboot.vo.Coupon;
 import itView.springboot.vo.ExperienceApplication;
 import itView.springboot.vo.ExperienceGroup;
@@ -29,7 +32,6 @@ import itView.springboot.vo.Order;
 import itView.springboot.vo.Product;
 import itView.springboot.vo.Question;
 import itView.springboot.vo.Review;
-import itView.springboot.vo.ReviewAnswer;
 import itView.springboot.vo.User;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +41,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProductController {
 	private final ProductService pService;
+	private final ShoppingService sService;
+
 	private final BCryptPasswordEncoder bcrypt;
 	
 	
@@ -99,6 +103,7 @@ public class ProductController {
 	public String productQnAPage(Model model, HttpSession session) {
 		
 		User loginUser = (User)session.getAttribute("loginUser");
+		int userNo = loginUser.getUserNo();
 		
 		Product product = new Product();
 		product.setUserNo(loginUser.getUserNo());
@@ -107,15 +112,14 @@ public class ProductController {
 		
 		ArrayList<Question> qList = new ArrayList<Question>();
 		
-		int beforeAnswer = pService.selectBeforeAnswerCount();
-		int afterAnswer = pService.selectAfterAnswerCount();
+		int beforeAnswer = pService.selectBeforeAnswerCount(userNo);
+		int afterAnswer = pService.selectAfterAnswerCount(userNo);
 		
 		for(int i = 0; i < pList.size(); i++) {
 			int productNo = pList.get(i).getProductNo();
 			qList.addAll(pService.selectQuestion(productNo));
 			
 		}
-		
 		model.addAttribute("qList", qList);
 		model.addAttribute("ba", beforeAnswer);
 		model.addAttribute("aa", afterAnswer);
@@ -147,17 +151,6 @@ public class ProductController {
 		product.setUserNo(userNo);
 		
 		ArrayList<Product> rList = pService.countReview(userNo);
-		
-		ArrayList<ReviewAnswer> raCount = pService.countReviewAnswer(userNo);
-		
-		//System.out.println(raCount);
-		
-//		for(int i = 0; i < rList.size(); i++) {
-			// UserNo 이용해서 DB에 있는 쿼리문 갖고와서 review_answer count해오기
-			// rList에 있는 review_count랑 review_answer_count랑 연산
-			// 그 결과를 화면에 고고
-			// product에 있는 user_n
-//		}
 		
 		model.addAttribute("rCount", rList);
 		return "seller/myProductPage";
@@ -219,9 +212,6 @@ public class ProductController {
 		
 		ArrayList<Question> question = pService.selectQuestion(productNo);
 		
-		//System.out.println(rList);
-		
-		
 		ArrayList<Answer> answer = new ArrayList<Answer>();
 		
 		for(int i = 0; i < question.size(); i++) {
@@ -260,7 +250,7 @@ public class ProductController {
 	
 	// 상품 상세페이지 이동
 	@GetMapping("/detail/{productNo}")
-	public String productdetail(@PathVariable("productNo") int productNo, Model model) {
+	public String productdetail(@PathVariable("productNo") int productNo,HttpSession session, Model model) {
 		
 		Product product = new Product();
 		product.setProductNo(productNo);
@@ -300,6 +290,16 @@ public class ProductController {
 			p.setEcoFriendly("일반 제품");
 		}
 		
+		//서연
+		Integer wishlistNo = null;   
+
+		User loginUser = (User) session.getAttribute("loginUser");
+			    
+		if (loginUser != null) {   
+			int uNo = loginUser.getUserNo();
+			wishlistNo = sService.checkWishNo(uNo, productNo); 
+		}
+		
 		model.addAttribute("p", p);
 		model.addAttribute("cList", cList);
 		model.addAttribute("attm", attm);
@@ -307,6 +307,7 @@ public class ProductController {
 		model.addAttribute("reviewCount", reviewCount);
 		model.addAttribute("qList", question);
 		model.addAttribute("aList", answer);
+		model.addAttribute("wishlistNo",wishlistNo);
 		
 		return "Shopping/detail";
 	}
@@ -319,6 +320,19 @@ public class ProductController {
 		
 		model.addAttribute("userNo", userNo);
 		return "seller/expWritePage";
+	}
+	
+	// 체험단 신청글 관리 페이지 이동
+	@GetMapping("expEditPage")
+	public String expEditPage(Model model, HttpSession session) {
+		
+		User user = (User)session.getAttribute("loginUser");
+		int userNo = user.getUserNo();
+		ArrayList<ExperienceGroup> eList = pService.selectMyExp(userNo);
+		
+		model.addAttribute("eList", eList);
+		
+		return "seller/expEditPage";
 	}
 	
 	// 체험단 관리 페이지 이동
@@ -337,11 +351,43 @@ public class ProductController {
 			eaList.addAll(pService.selectExpApp(expNo));
 		}
 		
-		System.out.println(eaList);
-		
 		model.addAttribute("eaList", eaList);
 		
 		return "seller/experienceManagePage";
+	}
+	
+	// 문의하기 페이지 이동
+	@GetMapping("questionPage")
+	public String questionPage() {
+		return "seller/questionPage";
+	}
+		
+	// 문의 내역 페이지 이동
+	@GetMapping("questionManagePage")
+	public String questionManagePage(Model model, HttpSession session) {
+		User loginUser = (User)session.getAttribute("loginUser");
+		int userNo = loginUser.getUserNo();
+		
+		ArrayList<Board> bList = pService.selectMyBoard(userNo);
+		
+		model.addAttribute("bList", bList);
+		
+		return "seller/questionManagePage";
+	}
+	
+	// 문의 상세 페이지 이동
+	@GetMapping("MyQuestionDetail/{boardId}")
+	public String myQuestionDetail(@PathVariable("boardId") int boardId, Model model) {
+		Board b = pService.selectMyBoardDetail(boardId);
+		
+		ArrayList<AdminReply> r = pService.selectBoardReply(boardId);
+		
+		model.addAttribute("b", b);
+		if(r != null) {
+			model.addAttribute("r", r);
+		}
+		
+		return "/seller/myQuestionDetail";
 	}
 	
 	// 상품 등록
@@ -553,6 +599,24 @@ public class ProductController {
 			return "redirect:/product/detail/" + productNo;
 		} else {
 			throw new ProductException("쿠폰 다운로드가 실패하였습니다.");
+		}
+	}
+	
+	// 문의페이지 이동
+	@GetMapping("/productInquery/{productNo}")
+	public String productInquery(@PathVariable("productNo") int productNo, Model model) {
+		model.addAttribute("productNo", productNo);
+		return "my/myProductInquiry";
+	}
+	
+	// 문의글 등록
+	@PostMapping("/writeQuestion")
+	public String insertQuestion(@ModelAttribute Board board) {
+		int result = pService.insertQuestion(board);
+		if(result > 0) {
+			return "redirect:/seller/questionManagePage";
+		} else {
+			throw new ProductException("문의글 등록을 실패하였습니다.");
 		}
 	}
 }

@@ -1,5 +1,7 @@
 package itView.springboot.vo;
 
+import java.sql.Date;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,8 +31,10 @@ public class Product {
 	private String gender;
 	private String ingredient;
 	private String ecoFriendly;
+	private Date productCreateDate;
 	
 	private int reviewCount;
+	private int reviewAnswerCount;
 	
 	// join시 가져올 이름
 	private String brandName;

@@ -135,7 +135,7 @@
             <a th:if="${session.loginUser != null}" th:href="@{/login/logout}">로그아웃</a>
             <a th:if="${session.loginUser != null && session.loginUser.userType == 'U' }" th:href="@{/my/myPage}">마이페이지</a>
             <a th:if="${session.loginUser != null && session.loginUser.userType == 'P' }" th:href="@{/seller/home}">판매자 마이페이지</a>
-            <a th:if="${session.loginUser != null && session.loginUser.userType == 'A' }" th:href="@{/inhoAdmin/enrollCouponNotice}">관리자 마이페이지</a>
+            <a th:if="${session.loginUser != null && session.loginUser.userType == 'A' }" th:href="@{/inhoAdmin/adminMain}">관리자 마이페이지</a>
             <a th:if="${loginUser!=null and loginUser.userType=='u'}" th:href="@{/Shopping/cart}">장바구니</a>
             <a th:if="${session.loginUser != null && session.loginUser.userType == 'U' }" href="#">주문배송</a>
         </div>
@@ -145,7 +145,7 @@
         <a th:href="@{/}" class="logo">it:View</a>
         <form class="d-flex search-bar" action="/search">
             <div class="input-group">
-                <input class="form-control" type="search" name="q" placeholder="상품, 브랜드" aria-label="Search" />
+                <input class="form-control" type="search" name="q" placeholder="상품, 브랜드, 피부타입" aria-label="Search" />
                 <button class="btn btn-primary" type="submit">검색</button>
             </div>
         </form>
