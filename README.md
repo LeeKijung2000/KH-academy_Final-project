@@ -51,6 +51,9 @@
 ### 게시판 (공지사항)
 <img width="1374" height="693" alt="image" src="https://github.com/user-attachments/assets/34d460bc-90ba-4eab-a3ad-e920c83fd5e9" />
 
+### 랭킹
+<img width="1405" height="799" alt="image" src="https://github.com/user-attachments/assets/cf1f117b-f6d8-4598-98b5-275ad604c96d" />
+
 
 ### 커뮤니티
 <img width="1373" height="747" alt="image" src="https://github.com/user-attachments/assets/b23789e5-24a1-4fb1-bafe-005fec14577a" />
