@@ -1,4 +1,5 @@
 <img width="954" height="539" alt="image" src="https://github.com/user-attachments/assets/94bf0f45-4ad2-4444-932f-79a4d907a662" />
+<img width="1382" height="929" alt="결제" src="https://github.com/user-attachments/assets/11f979b3-f963-4082-a8b6-861421448f6e" />
 
 
 # 🧴 화해 모티브 화장품 사이트 (Final Project)
