@@ -1,0 +1,19 @@
+@startuml
+actor User
+participant "Web Browser" as Browser
+participant "DeliveryController" as Controller
+participant "DeliveryService" as Service
+participant "DeliveryAPI" as API
+database "DB" as DB
+
+User -> Browser : 배송조회 요청
+Browser -> Controller : GET /delivery/{orderId}
+Controller -> Service : getDeliveryStatus(orderId)
+Service -> DB : SELECT trackingNumber FROM orders WHERE orderId=?
+DB --> Service : trackingNumber 반환
+Service -> API : 배송 상태 확인(trackingNumber)
+API --> Service : 배송 상태 반환
+Service --> Controller : 배송 상태 전달
+Controller --> Browser : 배송 상태 표시
+Browser --> User : 배송 현황 확인
+@enduml

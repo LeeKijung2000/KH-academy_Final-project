@@ -1,0 +1,19 @@
+@startuml
+actor User
+participant "Web Browser" as Browser
+participant "AuthController" as Controller
+participant "UserService" as Service
+participant "UserMapper" as Mapper
+database "DB" as DB
+
+User -> Browser : 회원가입 폼 입력
+Browser -> Controller : POST /signup {id, pw, email}
+Controller -> Service : registerUser(dto)
+Service -> Mapper : insertUser(dto)
+Mapper -> DB : INSERT INTO users ...
+DB --> Mapper : 저장 성공
+Mapper --> Service : 성공 응답
+Service --> Controller : 회원가입 완료
+Controller --> Browser : 가입 완료 메시지
+Browser --> User : "회원가입 성공"
+@enduml

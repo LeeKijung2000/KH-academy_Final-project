@@ -1,0 +1,29 @@
+@startuml
+actor User
+actor Admin
+participant "Web Browser" as Browser
+participant "AdminBrowser" as AdminBrowser
+participant "ReportController" as Controller
+participant "ReportService" as Service
+participant "ReportMapper" as Mapper
+database "DB" as DB
+
+User -> Browser : 게시글/댓글 신고
+Browser -> Controller : POST /report {postId/commentId, reason}
+Controller -> Service : submitReport(dto)
+Service -> Mapper : insertReport(dto)
+Mapper -> DB : INSERT INTO reports ...
+DB --> Mapper : 저장 성공
+Mapper --> Service : 성공 반환
+Service -> Mapper : countReports(postId/commentId)
+Mapper -> DB : SELECT COUNT(*) FROM reports WHERE postId/commentId = ?
+DB --> Mapper : 신고 누적 수 반환
+Mapper --> Service : 누적 수 전달
+alt 신고 누적 기준 초과
+    Service --> AdminBrowser : 관리자 알림
+    AdminBrowser --> Admin : 신고 알림 확인
+end
+Service --> Controller : 신고 접수 완료
+Controller --> Browser : 신고 접수 메시지
+Browser --> User : "신고 접수 완료"
+@enduml

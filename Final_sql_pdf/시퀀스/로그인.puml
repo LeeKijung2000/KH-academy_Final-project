@@ -1,0 +1,22 @@
+@startuml
+actor User
+participant "Web Browser" as Browser
+participant "AuthController" as Controller
+participant "CustomUserDetailsService" as UserDetailsService
+participant "UserMapper" as Mapper
+database "DB" as DB
+participant "Spring Security" as Security
+
+User -> Browser : 아이디/비밀번호 입력
+Browser -> Controller : POST /login {id, pw}
+Controller -> Security : authenticate(id, pw)
+Security -> UserDetailsService : loadUserByUsername(id)
+UserDetailsService -> Mapper : selectUserById(id)
+Mapper -> DB : SELECT * FROM users WHERE id = ?
+DB --> Mapper : User 데이터 반환
+Mapper --> UserDetailsService : User 객체 반환
+UserDetailsService --> Security : UserDetails 반환
+Security --> Controller : 인증 성공
+Controller --> Browser : 로그인 성공 세션 반환
+Browser --> User : "로그인 성공"
+@enduml

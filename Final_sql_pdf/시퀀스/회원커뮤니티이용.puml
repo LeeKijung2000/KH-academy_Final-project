@@ -1,0 +1,19 @@
+@startuml
+actor User
+participant "Web Browser" as Browser
+participant "BoardController" as Controller
+participant "BoardService" as Service
+participant "BoardMapper" as Mapper
+database "DB" as DB
+
+User -> Browser : 게시글 조회/작성
+Browser -> Controller : GET/POST /board {글/댓글 정보}
+Controller -> Service : getPosts() / addPost(dto)
+Service -> Mapper : selectPosts() / insertPost(dto)
+Mapper -> DB : SELECT * FROM posts / INSERT INTO posts ...
+DB --> Mapper : 결과 반환/저장 성공
+Mapper --> Service : 데이터 전달
+Service --> Controller : 게시글/댓글 처리 완료
+Controller --> Browser : 게시글/댓글 표시
+Browser --> User : 게시글/댓글 확인
+@enduml

@@ -1,0 +1,37 @@
+@startuml
+actor User
+participant "Web Browser" as Browser
+participant "PaymentController" as Controller
+participant "PaymentService" as Service
+participant "OrderMapper" as OrderMapper
+participant "CouponMapper" as CouponMapper
+participant "PG사 API" as PG
+database "DB" as DB
+
+User -> Browser : 결제 진행
+Browser -> Controller : POST /payment {orderId, cardInfo, couponId}
+Controller -> Service : processPayment(orderId, cardInfo, couponId)
+Service -> CouponMapper : validateCoupon(couponId)
+CouponMapper -> DB : SELECT * FROM coupons WHERE id=?
+DB --> CouponMapper : 쿠폰 정보 반환
+CouponMapper --> Service : 쿠폰 적용 가능 여부
+alt 쿠폰 적용 가능
+    Service -> OrderMapper : updateOrderWithCoupon(orderId, couponId)
+    OrderMapper -> DB : UPDATE orders ...
+    DB --> OrderMapper : 성공
+end
+Service -> PG : 결제 요청
+PG --> Service : 승인/실패 결과
+alt 결제 성공
+    Service -> OrderMapper : updateOrderStatus(orderId, "PAID")
+    OrderMapper -> DB : UPDATE orders ...
+    DB --> OrderMapper : 성공
+    Service --> Controller : 결제 완료
+    Controller --> Browser : 결제 성공 응답
+    Browser --> User : "결제 성공"
+else 결제 실패
+    Service --> Controller : 결제 실패
+    Controller --> Browser : 실패 응답
+    Browser --> User : "결제 실패"
+end
+@enduml

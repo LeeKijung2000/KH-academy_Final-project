@@ -1,0 +1,19 @@
+@startuml
+actor Seller
+participant "Web Browser" as Browser
+participant "ProductController" as Controller
+participant "ProductService" as Service
+participant "ProductMapper" as Mapper
+database "DB" as DB
+
+Seller -> Browser : 상품 등록 폼 입력
+Browser -> Controller : POST /seller/products {상품 정보 + 이미지}
+Controller -> Service : addProduct(dto)
+Service -> Mapper : insertProduct(dto)
+Mapper -> DB : INSERT INTO products ...
+DB --> Mapper : 저장 성공
+Mapper --> Service : 성공 반환
+Service --> Controller : 상품 등록 완료
+Controller --> Browser : "상품 등록 완료"
+Browser --> Seller : "상품 등록 성공"
+@enduml
