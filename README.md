@@ -1,11 +1,10 @@
-<img width="954" height="539" alt="image" src="https://github.com/user-attachments/assets/94bf0f45-4ad2-4444-932f-79a4d907a662" />
-
 
 # 🧴 화해 모티브 화장품 사이트 (Final Project)
 
 ## 📌 프로젝트 개요
 이 프로젝트는 **화해를 모티브**로 한 화장품 사이트로, 고객 응대를 중심으로 기능을 설계하고 개발했습니다.  
 메인 화면 및 전반적인 **UI/UX 디자인** 또한 직접 담당하여 사용자 친화적인 화면 구성을 구현했습니다.  
+<img width="1316" height="819" alt="image" src="https://github.com/user-attachments/assets/8d520c3d-4656-4f36-b028-7303dbd2c6c5" />
 
 제가 담당한 주요 기능은 다음과 같습니다:
 - 게시판 (공지사항, 문의사항, 이벤트 등)
@@ -43,9 +42,6 @@
 
 ## 📷 화면 예시
 > 프로젝트 실행 화면 캡처 이미지 예시입니다.  
-
-### 메인 화면
-<img width="1316" height="819" alt="image" src="https://github.com/user-attachments/assets/8d520c3d-4656-4f36-b028-7303dbd2c6c5" />
 
 
 ### 게시판 (공지사항)
