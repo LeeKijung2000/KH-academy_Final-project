@@ -1,6 +1,10 @@
 
 # 🧴 화해 모티브 화장품 사이트 (Final Project)
 
+### ERD
+<img width="4520" height="2611" alt="Copy of finalProject" src="https://github.com/user-attachments/assets/911caaa6-0c01-411b-9315-2f90906c4e69" />
+
+
 ## 📌 프로젝트 개요
 이 프로젝트는 **화해를 모티브**로 한 화장품 사이트로, 고객 응대를 중심으로 기능을 설계하고 개발했습니다.  
 메인 화면 및 전반적인 **UI/UX 디자인** 또한 직접 담당하여 사용자 친화적인 화면 구성을 구현했습니다.  
@@ -65,9 +69,6 @@
 <img width="1428" height="809" alt="image" src="https://github.com/user-attachments/assets/7420284e-d99d-4c6f-bd1c-d0235d522c56" />
 
 
-
-### ERD
-<img width="4520" height="2611" alt="Copy of finalProject" src="https://github.com/user-attachments/assets/911caaa6-0c01-411b-9315-2f90906c4e69" />
 
 ### 다이어그램
 <img width="1382" height="929" alt="결제" src="https://github.com/user-attachments/assets/11f979b3-f963-4082-a8b6-861421448f6e" />
