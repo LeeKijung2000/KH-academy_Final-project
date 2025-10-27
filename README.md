@@ -126,30 +126,4 @@
 
 ---
 
-## 🧠 10. 핵심 코드 예시
-
-### 🔹 게시판 작성 (Controller)
-```java
-@PostMapping("/notice/write")
-public String writeNotice(NoticeDTO noticeDTO, RedirectAttributes redirectAttributes) {
-    noticeService.insertNotice(noticeDTO);
-    redirectAttributes.addFlashAttribute("message", "공지사항이 등록되었습니다.");
-    return "redirect:/notice/list";
-}
-### 🔹 대댓글 등록 (Service)
-@Override
-public void insertReply(ReplyDTO replyDTO) {
-    if(replyDTO.getParentId() != null) {
-        replyMapper.insertChildReply(replyDTO);
-    } else {
-        replyMapper.insertParentReply(replyDTO);
-    }
-}
-### 🔹 게시판 검색 (Mapper XML)
-<select id="searchNotice" parameterType="map" resultType="NoticeDTO">
-    SELECT * FROM notice
-    WHERE title LIKE '%' || #{keyword} || '%'
-    OR content LIKE '%' || #{keyword} || '%'
-    ORDER BY created_date DESC
-</select>
 
